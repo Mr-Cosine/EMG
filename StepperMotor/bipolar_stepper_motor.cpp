@@ -1,7 +1,5 @@
 #include "Bipolar_stepper_motor.h"
  
-// ---- Member class ----]
- 
 double Bipolar_stepper_motor::Speed_levels::interpolate_delay_ms(int speed_level) {
   return (double)this->min_speed.interstep_delay - (double)(this->min_speed.interstep_delay - this->max_speed.interstep_delay)
           /
@@ -16,13 +14,6 @@ void Bipolar_stepper_motor::Speed_levels::set_interstep_delay_min_ms(int delay_m
 void Bipolar_stepper_motor::Speed_levels::set_interstep_delay_max_ms(int delay_max) { min_speed.interstep_delay = delay_max; }
  
 // ---- Bipolar_stepper_motor ----
- 
-void Bipolar_stepper_motor::setStep(bool a1, bool a2, bool b1, bool b2) {
-  digitalWrite(this->IN1, a1);
-  digitalWrite(this->IN2, a2);
-  digitalWrite(this->IN3, b1);
-  digitalWrite(this->IN4, b2);
-}
  
 void Bipolar_stepper_motor::set_number_of_speed_levels(int speed_max) { }
  

@@ -12,7 +12,9 @@
 #define repeat_times_w_counter(counter, times) for (int (counter)=0; (counter)<(times); (counter)++)
 #define repeat_until(condition) while(!condition)
 #define repeat_while(condition) while(condition)
-#define repeat_forever(condition) while(true)
+#define repeat_forever while(true)
+
+
 
 class Bipolar_stepper_motor {
   struct Ref_point {
@@ -26,6 +28,11 @@ class Bipolar_stepper_motor {
   };
 
   class Speed_levels {
+    /*  
+    * @param valmax: the highest level of speed
+    * @param delaymin: the lowest delay per step (determines how fast the highest speed level is)
+    * @param delaymax: the highest delay per step (determines how slow the lowest speed level is)
+    */
     private:
       Ref_point max_speed;
       Ref_point min_speed;
@@ -44,11 +51,16 @@ class Bipolar_stepper_motor {
   private:
     int IN1; int IN2; int IN3; int IN4;
     int actuation_length_forward; // in cycles, need to be measured and adjusted accordingly
-    int actuation_length_backward;
+    int actuation_length_backward; // in cycles, need to be measured and adjusted accordingly
     int current_speed_level;
     Speed_levels speed_levels;
 
-    void setStep(bool, bool, bool, bool);
+    void setStep(bool, bool, bool, bool) {
+      digitalWrite(this->IN1, a1);
+      digitalWrite(this->IN2, a2);
+      digitalWrite(this->IN3, b1);
+      digitalWrite(this->IN4, b2);
+    }
 
   public:
     // CONSTRUCTORS

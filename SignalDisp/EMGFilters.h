@@ -2,13 +2,6 @@
 #define _EMGFILTERS_H
 #include "Filters.h"
 #include "constants.h"
- 
-/* @brief EMGFilter provides:
-*        anti-hum notch filter to filter out 50HZ or 60HZ power line noise
-*        lowpass filter to filter out signals above 150HZ
-*        highpass filter to filter out noise below 20HZ;
-* @remark only accept 500Hz and 1000Hz sampling rate as parameter when initialize
-*/
 
 class EMGFilters {
   public:
