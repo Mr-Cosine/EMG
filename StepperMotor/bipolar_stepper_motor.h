@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #ifndef default_iterator
-#define default_iterator _qwwdvdca
+#define default_iterator _QW5keSBpcyBmdWNraW5nIGF3ZXNvbWUh  // change this to whatever you like (make sure don't use this naming in any other iterators in the loop)
 #endif
 
 #define repeat_times(times) for(int default_iterator=0; default_iterator<(times); default_iterator++)
@@ -14,14 +14,16 @@
 #define repeat_while(condition) while(condition)
 #define repeat_forever while(true)
 
-
-
 class Bipolar_stepper_motor {
-  struct Ref_point {
+  struct Ref_point { 
+    /*  
+    * @param value: the numeric level displayed
+    * @param delay: the time between each step of motor actuation
+    */
     int value;
-    int interstep_delay;
+    double interstep_delay;
 
-    Ref_point(int value, int delay):
+    Ref_point(int value, double delay):
       value(value),
       interstep_delay(delay)
     {}
@@ -37,15 +39,17 @@ class Bipolar_stepper_motor {
       Ref_point max_speed;
       Ref_point min_speed;
     public:
-      Speed_levels(int valmax, int delaymin, int delaymax):
+      Speed_levels(int valmax, double delaymin, double delaymax):
         max_speed(Ref_point(valmax, delaymin)),
         min_speed(Ref_point(1, delaymax))
       {}
 
       double interpolate_delay_ms(int);
+
       int max_speed_level();
-      void set_interstep_delay_min_ms(int);
-      void set_interstep_delay_max_ms(int);
+      void set_max_speed_level(int);
+      void set_interstep_delay_min_ms(double);
+      void set_interstep_delay_max_ms(double);
   };
 
   private:
@@ -55,7 +59,7 @@ class Bipolar_stepper_motor {
     int current_speed_level;
     Speed_levels speed_levels;
 
-    void setStep(bool, bool, bool, bool) {
+    void setStep(bool a1, bool a2, bool b1, bool b2) {
       digitalWrite(this->IN1, a1);
       digitalWrite(this->IN2, a2);
       digitalWrite(this->IN3, b1);
@@ -77,6 +81,11 @@ class Bipolar_stepper_motor {
       pinMode(this->IN4, OUTPUT);
     }
 
+    int get_number_of_speed_levels() { return this->speed_levels.max_speed_level(); }
+    int get_current_speed_level() { return this->current_speed_level; }
+    int get_forward_actuation_length() { return this->actuation_length_forward; }
+    int get_backward_actuation_length() { return this->actuation_length_backward; }
+
     // CONFIGURATIONS
     void set_number_of_speed_levels(int);
     void set_speed_level(int);
@@ -85,14 +94,12 @@ class Bipolar_stepper_motor {
     void set_all_actuation_length_based_on_backward(int);
     void set_forward_actuation_length(int);
     void set_backward_actuation_length(int);
-    void set_interstep_delay_min_ms(int);
-    void set_interstep_delay_max_ms(int);
+    void set_interstep_delay_min_ms(double);
+    void set_interstep_delay_max_ms(double);
 
     // ACTUATIONS
     void move_forward_single();
-    void move_forward_single(int);
     void move_backward_single();
-    void move_backward_single(int);
     void move_forward();
     void move_forward(int);
     void move_backward();
