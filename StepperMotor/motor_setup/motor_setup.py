@@ -17,7 +17,6 @@ else:
 pin = config.get("pin", None)
 actuation_length = config.get("actuation_length", {}) or {}
 interstep_delay = config.get("interstep_delay", {}) or {}
-speed_level = config.get("speed_level", None)
 
 port = None
 port_name = None
@@ -25,12 +24,13 @@ port_name = None
 COMMAND_LIST = {
     "forward": "FWD",
     "backward": "BWD",
-    "increase_speed": "SPDU",
-    "decrease_speed": "SPDD"
+    "set_speed": "SPD",
+    "set_delay_min": "DMIN",
+    "set_delay_max": "DMAX"
 }
-def send(port, cmd):
+def send(port, cmd, data = None):
     port.reset_input_buffer()
-    port.write((COMMAND_LIST[cmd] + "\n").encode())
+    port.write((COMMAND_LIST[cmd] + "," + str(data) + "\n").encode())
     return port.readline().decode(errors="replace").strip()
 
 def set_serial():
@@ -171,6 +171,45 @@ def setup_length():
 
     actuation_length['backward'] = cycle_counter * 10
 
+def _test_motor_menu():
+
+    """Let the user repeatedly jog the motor forward/backward at the current settings."""
+
+    while True:
+        direction = UI.print_selections("Test the motor at this speed:", [
+            {"text": "Forward", "color": "cyan", "id": "forward"},
+            {"text": "Backward", "color": "cyan", "id": "backward"},
+            {"text": "Done testing", "color": "yellow", "id": "done"}
+        ])
+        if direction == "done": return
+        send(port, direction)
+
+def _calibrate_delay(step_label, config_key, command_key):
+    print(f"Setting the {step_label} inter-step delay.")
+    while True:
+        entry = UI.safe_input(f"Enter {step_label.lower()} delay in ms: ").strip()
+        try:
+            value = int(entry)
+        except ValueError:
+            print(f"'{entry}' is not a whole number, try again.")
+            continue
+        if value < 0:
+            print("Delay can't be negative, try again.")
+            continue
+        break
+
+    send(port, command_key, value)
+    print(f"{step_label.capitalize()} delay set to {value}ms.")
+    print()
+    _test_motor_menu()
+
+    if UI.print_yesorno(f"Keep this {step_label.lower()} delay?") == 'y':
+        interstep_delay[config_key] = value
+        print(f"{step_label.capitalize()} delay saved.")
+    else:
+        print(f"{step_label.capitalize()} delay discarded.")
+    UI.safe_input("Press enter to continue.")
+
 def setup_delay():
     UI.clear_screen()
 
@@ -182,35 +221,21 @@ def setup_delay():
 
     port.reset_input_buffer()
     print("Adjusting inter-step delay.")
-
-def setup_level():
-    UI.clear_screen()
-
-    global port, speed_level
-    if port is None:
-        print("No serial port connected — set the serial port first.")
-        UI.safe_input("Press enter to return.")
-        return
-
-    print("Adjusting speed levels.")
-    print(f"Current number of speed levels: {speed_level if speed_level is not None else 'not set'}")
     print()
 
-    while True:
-        entry = UI.safe_input("Enter the number of speed levels (0 - 255): ").strip()
-        try:
-            value = int(entry)
-        except ValueError:
-            print(f"'{entry}' is not a whole number, try again.")
-            continue
-        if not 0 <= value <= 255:
-            print(f"{value} is out of the 0 - 255 range, try again.")
-            continue
-        speed_level = value
-        break
+    _calibrate_delay("MINIMUM (fastest speed)", "min", "set_delay_min")
 
-    print(f"Speed levels set to {speed_level}.")
-    UI.safe_input("Press enter to return.")
+    UI.clear_screen()
+    _calibrate_delay("MAXIMUM (slowest speed)", "max", "set_delay_max")
+
+    if interstep_delay.get("min") is not None and interstep_delay.get("max") is not None:
+        if interstep_delay["min"] >= interstep_delay["max"]:
+            coutput.print(
+                "Warning: minimum delay should normally be smaller than maximum delay "
+                "(fast speed = shorter delay, slow speed = longer delay).",
+                color="red"
+            )
+            UI.safe_input("Press enter to return.")
 
 def quit(save=True):
     UI.clear_screen()
@@ -219,8 +244,7 @@ def quit(save=True):
             json.dump({
                 "pin": pin,
                 "actuation_length": actuation_length,
-                "interstep_delay": interstep_delay,
-                "speed_level": speed_level
+                "interstep_delay": interstep_delay
             }, motor_config)
     motor_config.close()
     print("Exiting program.")        
@@ -264,15 +288,6 @@ options_home = [
         }
     },
     {
-        "text": "adjust speed levels",
-        "color": "blue",
-        "id": "level",
-        "func": {
-            "body": setup_level,
-            "param": []
-        }
-    },
-    {
         "text": "quit and save",
         "color": "red",
         "id": "quit save",
@@ -294,7 +309,6 @@ def home_prompt():
         f"    {coutput.get_print_string_text("Interstep delay:", color="white")}",
         f"        {coutput.get_print_string_text("Min(fastest): ", color="white")}{coutput.get_print_string_text(interstep_delay.get("min", None), color="yellow")}",
         f"        {coutput.get_print_string_text("Max(slowest): ", color="white")}{coutput.get_print_string_text(interstep_delay.get("max", None), color="yellow")}",
-        f"    {coutput.get_print_string_text("Number of speed levels: ", color="white")}{coutput.get_print_string_text(speed_level, color="yellow")}",
         f"{coutput.get_print_string_text("====================================", color="white")}"
     ])
 UI.home_menu(name="Motor Setup", prompt=home_prompt, options=options_home)

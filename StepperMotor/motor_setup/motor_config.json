@@ -12,6 +12,5 @@
     "interstep_delay": {
         "min": null,
         "max": null
-    },
-    "speed_level": null
+    }
 }
