@@ -268,17 +268,15 @@ def setup_delay():
 #-------------------------------------------------------------------------------------------------
 
 def quit(save=True):
-    UI.clear_screen()
     if (save==True):
         with open("motor_config.json", "w") as motor_config:
             json.dump({
                 "pin": pin,
                 "actuation_length": actuation_length,
                 "interstep_delay": interstep_delay
-            }, motor_config)
+            }, motor_config, indent=4)
     motor_config.close()
-    print("Exiting program.")        
-    exit(0)
+    UI.quit_program()
 
 #-------------------------------------------------------------------------------------------------
 #   Main menu

@@ -4,12 +4,13 @@ from .interactive import (
     display_width,
     safe_input,
     clear_screen,
+    select_files,
+    select_folder,
     print_selections,
     print_yesorno,
     print_banner,
     print_header,
     menu,
     home_menu,
-    select_files,
-    select_folder
+    quit_program
 )

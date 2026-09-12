@@ -172,6 +172,54 @@ def print_header(input_string, color='white'):
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
+def select_files(file_types):
+    """
+    opens file selection dialog.
+
+    :param file_types:      [string...],    list of wanted types, eg. ['jpg', 'pdf', 'txt]
+    :param 
+
+    :return:                the selected file location, if not selected return None
+    """
+    root = tkinter.Tk()
+    root.withdraw()
+
+    print()
+
+    if isinstance(file_types, str):
+        file_types = [file_types]
+
+    filetypes = []
+    for ft in file_types:
+        ext = ft.lstrip('*.')
+        desc = ext.lower() + ' File'
+        filetypes.append((desc, ft))
+    filetypes.append(('All Files', '*.*'))
+
+    files = tkinter.filedialog.askopenfilenames(
+        title='File selection',
+        filetypes=filetypes
+    )
+
+    root.destroy()
+    return files if files else None
+
+#----------------------------------------------------------------------------------------------------------------------------------
+
+def select_folder():
+    """
+    opens file selection dialog.
+
+    :return:                the selected folder path, if not selected return None
+    """
+    root = tkinter.Tk()
+    root.withdraw()
+    folder = tkinter.filedialog.askdirectory(title='Folder selection')
+    root.destroy()
+    return folder if folder else None;
+
+#----------------------------------------------------------------------------------------------------------------------------------
+
 def print_yesorno(prompt):
     """
     print yes or no choice to let user select.
@@ -348,56 +396,13 @@ def home_menu(name, prompt, options):
                             ]
     """
     result = menu(name, prompt, options, home=True)
-    if result == 'quit':
-        clear_screen()
-        default_colored_output.print("Exiting program.", color='white')
-        default_colored_output.print('='*30, color='white')
-        sys.exit(0)
+    if result == 'quit': quit_program(0)
 
-#----------------------------------------------------------------------------------------------------------------------------------
-
-def select_files(file_types):
-    """
-    opens file selection dialog.
-
-    :param file_types:      [string...],    list of wanted types, eg. ['jpg', 'pdf', 'txt]
-    :param 
-
-    :return:                the selected file location, if not selected return None
-    """
-    root = tkinter.Tk()
-    root.withdraw()
-
-    print()
-
-    if isinstance(file_types, str):
-        file_types = [file_types]
-
-    filetypes = []
-    for ft in file_types:
-        ext = ft.lstrip('*.')
-        desc = ext.lower() + ' File'
-        filetypes.append((desc, ft))
-    filetypes.append(('All Files', '*.*'))
-
-    files = tkinter.filedialog.askopenfilenames(
-        title='File selection',
-        filetypes=filetypes
-    )
-
-    root.destroy()
-    return files if files else None
-
-#----------------------------------------------------------------------------------------------------------------------------------
-
-def select_folder():
-    """
-    opens file selection dialog.
-
-    :return:                the selected folder path, if not selected return None
-    """
-    root = tkinter.Tk()
-    root.withdraw()
-    folder = tkinter.filedialog.askdirectory(title='Folder selection')
-    root.destroy()
-    return folder if folder else None;
+def quit_program(code: int = 0):
+    clear_screen()
+    default_colored_output.print("Exiting program.", color='white')
+    default_colored_output.print('='*30, color='white')
+    
+    try: keyboard.unhook_all()
+    except: pass
+    finally: sys.exit(code)
