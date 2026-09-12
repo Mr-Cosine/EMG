@@ -1,16 +1,1 @@
-{
-    "pin": {
-        "IN1": 2,
-        "IN2": 3,
-        "IN3": 4,
-        "IN4": 5
-    }, 
-    "actuation_length": {
-        "forward": null,
-        "backward": null
-    },
-    "interstep_delay": {
-        "min": null,
-        "max": null
-    }
-}
+{"pin": {"IN1": 2, "IN2": 3, "IN3": 4, "IN4": 5}, "actuation_length": {"forward": 380, "backward": 380}, "interstep_delay": {"min": 2, "max": 20}}

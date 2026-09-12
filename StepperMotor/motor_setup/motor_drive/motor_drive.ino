@@ -10,7 +10,7 @@ Bipolar_stepper_motor motor(IN1, IN2, IN3, IN4);
 void setup() {
   motor.set_number_of_speed_levels(20);
   motor.set_interstep_delay_min_ms(3);
-  motor.set_speed_level(1);
+  motor.set_speed_level(20);
 
   Serial.begin(9600);
   delay(50);
@@ -40,20 +40,12 @@ void handleSerialCommands() {
   String argStr = (commaIdx == -1) ? "" : line.substring(commaIdx + 1);
 
   if (cmd == "FWD") {
-    motor.move_forward_single();
+    repeat_times(10) {motor.move_forward_single();}
     Serial.println("OK");
 
   } else if (cmd == "BWD") {
-    motor.move_backward_single();
+    repeat_times(10) {motor.move_backward_single();}
     Serial.println("OK");
-
-  } else if (cmd == "SPD") {
-    if (argStr.length() == 0) {
-      Serial.println("ERR SPD needs a value");
-    } else {
-      motor.set_speed_level((level_t)argStr.toInt());
-      Serial.println("OK");
-    }
 
   } else if (cmd == "DMIN") {
     if (argStr.length() == 0) {

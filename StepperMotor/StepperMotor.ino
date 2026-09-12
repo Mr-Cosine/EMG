@@ -13,7 +13,7 @@ Bipolar_stepper_motor motor(IN1, IN2, IN3, IN4);
 
 void setup() {
   motor.set_number_of_speed_levels(20);
-  motor.set_interstep_delay_min_ms(3);
+  motor.set_interstep_delay_min_ms(2);
   motor.set_speed_level(1);
 
   pinMode(btn_fwd, INPUT_PULLUP);
