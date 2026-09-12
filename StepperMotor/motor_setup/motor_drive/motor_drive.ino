@@ -1,9 +1,9 @@
 #include "bipolar_stepper_motor.h"
 
-const int IN1 = 2;
-const int IN2 = 3;
-const int IN3 = 4;
-const int IN4 = 5;
+int IN1 = 2;
+int IN2 = 3;
+int IN3 = 4;
+int IN4 = 5;
 
 Bipolar_stepper_motor motor(IN1, IN2, IN3, IN4);
 
@@ -42,28 +42,65 @@ void handleSerialCommands() {
   if (cmd == "FWD") {
     repeat_times(10) {motor.move_forward_single();}
     Serial.println("OK");
-
-  } else if (cmd == "BWD") {
+  } 
+  else if (cmd == "BWD") {
     repeat_times(10) {motor.move_backward_single();}
     Serial.println("OK");
-
-  } else if (cmd == "DMIN") {
+  } 
+  else if (cmd == "DMIN") {
     if (argStr.length() == 0) {
       Serial.println("ERR DMIN needs a value");
     } else {
       motor.set_interstep_delay_min_ms(argStr.toFloat());
       Serial.println("OK");
     }
-
-  } else if (cmd == "DMAX") {
+  } 
+  else if (cmd == "DMAX") {
     if (argStr.length() == 0) {
       Serial.println("ERR DMAX needs a value");
     } else {
       motor.set_interstep_delay_max_ms(argStr.toFloat());
       Serial.println("OK");
     }
+  } 
+  else if (cmd == "PIN1") {
+    if (argStr.length() == 0) {
+      Serial.println("ERR PIN1 needs a value");
+    } else {
+      IN1 = argStr.toInt();
+      motor.set_pin_IN1(IN1);
+      Serial.println("OK");
+    }
+  } 
+  else if (cmd == "PIN2") {
+    if (argStr.length() == 0) {
+      Serial.println("ERR PIN2 needs a value");
+    } else {
+      IN2 = argStr.toInt();
+      motor.set_pin_IN2(IN2);
+      Serial.println("OK");
+    }
+  } 
+  else if (cmd == "PIN3") {
+    if (argStr.length() == 0) {
+      Serial.println("ERR PIN3 needs a value");
+    } else {
+      IN3 = argStr.toInt();
+      motor.set_pin_IN3(IN3);
+      Serial.println("OK");
+    }
+  } 
+  else if (cmd == "PIN4") {
+    if (argStr.length() == 0) {
+      Serial.println("ERR PIN4 needs a value");
+    } else {
+      IN4 = argStr.toInt();
+      motor.set_pin_IN4(IN4);
+      Serial.println("OK");
+    }
+  }
 
-  } else {
+  else {
     Serial.println("ERR unknown command");
   }
 }

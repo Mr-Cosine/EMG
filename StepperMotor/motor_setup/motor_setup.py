@@ -21,17 +21,30 @@ interstep_delay = config.get("interstep_delay", {}) or {}
 port = None
 port_name = None
 
+#-------------------------------------------------------------------------------------------------
+#   Communication with Arduino
+#-------------------------------------------------------------------------------------------------
+
 COMMAND_LIST = {
     "forward": "FWD",
     "backward": "BWD",
     "set_speed": "SPD",
     "set_delay_min": "DMIN",
-    "set_delay_max": "DMAX"
+    "set_delay_max": "DMAX",
+    "set_pin_IN1": "PIN1",
+    "set_pin_IN2": "PIN2",
+    "set_pin_IN3": "PIN3",
+    "set_pin_IN4": "PIN4",
 }
 def send(port, cmd, data = None):
+    if cmd not in COMMAND_LIST: raise ValueError("Unexpected command error.")
     port.reset_input_buffer()
     port.write((COMMAND_LIST[cmd] + "," + str(data) + "\n").encode())
     return port.readline().decode(errors="replace").strip()
+
+#-------------------------------------------------------------------------------------------------
+#   Connect to the Arduino board
+#-------------------------------------------------------------------------------------------------
 
 def set_serial():
     UI.clear_screen()
@@ -84,7 +97,10 @@ def set_serial():
     port = port_temp
 
     print("Board ready.")
-    
+
+#-------------------------------------------------------------------------------------------------
+#   Set pins for motor
+#-------------------------------------------------------------------------------------------------
 
 def setup_pin():
     UI.clear_screen()
@@ -123,10 +139,16 @@ def setup_pin():
     if UI.print_yesorno("Keep this layout?") == 'y':
         pin = selected
         print("Pin layout updated.")
+        for name, digital_pin in selected.items():
+            send(port, f"set_pin_{name}", digital_pin)
     else:
         print("Pin layout unchanged.")
 
     UI.safe_input("Press enter to return.")
+
+#-------------------------------------------------------------------------------------------------
+#   Set actuation length
+#-------------------------------------------------------------------------------------------------
 
 def setup_length():
     UI.clear_screen()
@@ -171,6 +193,10 @@ def setup_length():
 
     actuation_length['backward'] = cycle_counter * 10
 
+#-------------------------------------------------------------------------------------------------
+#   Set interstep delay (determines speed)
+#-------------------------------------------------------------------------------------------------
+
 def _test_motor_menu():
 
     """Let the user repeatedly jog the motor forward/backward at the current settings."""
@@ -184,7 +210,7 @@ def _test_motor_menu():
         if direction == "done": return
         send(port, direction)
 
-def _calibrate_delay(step_label, config_key, command_key):
+def _set_delay(step_label, config_key, command_key):
     print(f"Setting the {step_label} inter-step delay.")
     while True:
         entry = UI.safe_input(f"Enter {step_label.lower()} delay in ms: ").strip()
@@ -223,10 +249,10 @@ def setup_delay():
     print("Adjusting inter-step delay.")
     print()
 
-    _calibrate_delay("MINIMUM (fastest speed)", "min", "set_delay_min")
+    _set_delay("MINIMUM (fastest speed)", "min", "set_delay_min")
 
     UI.clear_screen()
-    _calibrate_delay("MAXIMUM (slowest speed)", "max", "set_delay_max")
+    _set_delay("MAXIMUM (slowest speed)", "max", "set_delay_max")
 
     if interstep_delay.get("min") is not None and interstep_delay.get("max") is not None:
         if interstep_delay["min"] >= interstep_delay["max"]:
@@ -236,6 +262,10 @@ def setup_delay():
                 color="red"
             )
             UI.safe_input("Press enter to return.")
+
+#-------------------------------------------------------------------------------------------------
+#   Quit
+#-------------------------------------------------------------------------------------------------
 
 def quit(save=True):
     UI.clear_screen()
@@ -249,6 +279,10 @@ def quit(save=True):
     motor_config.close()
     print("Exiting program.")        
     exit(0)
+
+#-------------------------------------------------------------------------------------------------
+#   Main menu
+#-------------------------------------------------------------------------------------------------
 
 options_home = [
     {
@@ -297,6 +331,7 @@ options_home = [
         }
     }
 ]
+# Home menu prompt builder (display current configuration)
 def home_prompt():
     return "\n".join([
         coutput.get_print_string_text("- SERIAL PORT:", color="red"),
@@ -311,4 +346,5 @@ def home_prompt():
         f"        {coutput.get_print_string_text("Max(slowest): ", color="white")}{coutput.get_print_string_text(interstep_delay.get("max", None), color="yellow")}",
         f"{coutput.get_print_string_text("====================================", color="white")}"
     ])
+
 UI.home_menu(name="Motor Setup", prompt=home_prompt, options=options_home)

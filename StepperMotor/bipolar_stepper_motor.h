@@ -115,6 +115,11 @@ class Bipolar_stepper_motor {
     length_t get_backward_actuation_length() { return this->actuation_length_backward; }
 
     // CONFIGURATIONS
+    void set_pin_IN1(uint8_t pin) { this->IN1 = pin; }
+    void set_pin_IN2(uint8_t pin) { this->IN2 = pin; }
+    void set_pin_IN3(uint8_t pin) { this->IN3 = pin; }
+    void set_pin_IN4(uint8_t pin) { this->IN4 = pin; }
+
     void set_number_of_speed_levels(level_t);
     void set_speed_level(level_t);
     void set_multiplied_actuation_length(float);
