@@ -2,7 +2,7 @@ import json
 import prettier_console as UI
 from prettier_console import default_colored_output as coutput
 from prettier_console import default_line_counter as line_counter
-import serial
+from serial import Serial
 import time
 import os
 
@@ -72,7 +72,7 @@ def set_serial():
 
     port_name_temp = UI.print_selections(f"Select from the following port(check Arduino IDE for board connection):", options)
     try:
-        port_temp = serial.Serial(port_name_temp, 9600, timeout=5)
+        port_temp = Serial(port_name_temp, 9600, timeout=5)
     except Exception:
         coutput.print("Connection failed, please retry.", color="red")
         UI.safe_input("Press enter to return.")
