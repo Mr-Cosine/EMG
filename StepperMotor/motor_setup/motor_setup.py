@@ -1,9 +1,12 @@
 import json
 import prettier_console as UI
 from prettier_console import default_colored_output as coutput
+from prettier_console import default_line_counter as line_counter
 import serial
 import time
 import os
+
+DEBUG_MODE = False
 
 if os.path.exists("motor_config.json"):
     with open("motor_config.json", "r") as motor_config:
@@ -38,9 +41,11 @@ COMMAND_LIST = {
 }
 def send(port, cmd, data = None):
     if cmd not in COMMAND_LIST: raise ValueError("Unexpected command error.")
-    port.reset_input_buffer()
-    port.write((COMMAND_LIST[cmd] + "," + str(data) + "\n").encode())
-    return port.readline().decode(errors="replace").strip()
+
+    if port is not None:
+        port.reset_input_buffer()
+        port.write((COMMAND_LIST[cmd] + "," + str(data) + "\n").encode())
+        return port.readline().decode(errors="replace").strip()
 
 #-------------------------------------------------------------------------------------------------
 #   Connect to the Arduino board
@@ -156,28 +161,35 @@ def setup_length():
     global port
     if port is None:
         print("No serial port connected — set the serial port first.")
-        UI.safe_input("Press enter to return.")
-        return
+        if not DEBUG_MODE:
+            UI.safe_input("Press enter to return.")
+            return
+        else:
+            response = UI.print_yesorno("Continue?")
+            if response != "y": return
 
-    port.reset_input_buffer()
     print("Caliberating actuation length.")
     print("Move the motor to the bottom.")
     print("Select yes to go backward once(10 actuation cycle). Until motor slider is at the starting point.")
     response = 'y'
     while(response == 'y'):
+        line_counter.reset()
         response = UI.print_yesorno("Continue?")
         if response == 'y':
             send(port, "backward")
+        UI.clear_lines(line_counter.printed_lines())
 
     print("Move the motor to the tip.")
     print("Select yes to go forward once(10 actuation cycle). Until motor slider is at the starting point.")
     cycle_counter = 0
     response = 'y'
     while(response == 'y'):
+        line_counter.reset()
         response = UI.print_yesorno("Continue?")
         if response == 'y':
             send(port, "forward")
             cycle_counter += 1
+        UI.clear_lines(line_counter.printed_lines())
 
     actuation_length['forward'] = cycle_counter * 10
 
@@ -186,10 +198,12 @@ def setup_length():
     cycle_counter = 0
     response = 'y'
     while(response == 'y'):
+        line_counter.reset()
         response = UI.print_yesorno("Continue?")
         if response == 'y':
             send(port, "backward")
             cycle_counter += 1
+        UI.clear_lines(line_counter.printed_lines())
 
     actuation_length['backward'] = cycle_counter * 10
 
@@ -200,13 +214,15 @@ def setup_length():
 def _test_motor_menu():
 
     """Let the user repeatedly jog the motor forward/backward at the current settings."""
-
+    
     while True:
+        line_counter.reset()
         direction = UI.print_selections("Test the motor at this speed:", [
             {"text": "Forward", "color": "cyan", "id": "forward"},
             {"text": "Backward", "color": "cyan", "id": "backward"},
             {"text": "Done testing", "color": "yellow", "id": "done"}
         ])
+        UI.clear_lines(line_counter.printed_lines())
         if direction == "done": return
         send(port, direction)
 
@@ -242,10 +258,13 @@ def setup_delay():
     global port
     if port is None:
         print("No serial port connected — set the serial port first.")
-        UI.safe_input("Press enter to return.")
-        return
+        if not DEBUG_MODE:
+            UI.safe_input("Press enter to return.")
+            return
+        else:
+            response = UI.print_yesorno("Continue?")
+            if response != "y": return
 
-    port.reset_input_buffer()
     print("Adjusting inter-step delay.")
     print()
 
@@ -262,6 +281,14 @@ def setup_delay():
                 color="red"
             )
             UI.safe_input("Press enter to return.")
+
+#-------------------------------------------------------------------------------------------------
+#   Toggle debug mode
+#-------------------------------------------------------------------------------------------------
+def set_debug():
+    UI.clear_screen()
+    global DEBUG_MODE
+    DEBUG_MODE = not DEBUG_MODE
 
 #-------------------------------------------------------------------------------------------------
 #   Quit
@@ -283,6 +310,15 @@ def quit(save=True):
 #-------------------------------------------------------------------------------------------------
 
 options_home = [
+    {
+        "text": "DEBUG_MODE",
+        "color": "white",
+        "id": "debug",
+        "func": {
+            "body": set_debug,
+            "param": []
+        }
+    },
     {
         "text": "set serial port(required to connect to board)",
         "color": "yellow",
@@ -320,7 +356,7 @@ options_home = [
         }
     },
     {
-        "text": "quit and save",
+        "text": "quit and save (!ONLY THIS SAVES CONFIGURATION!)",
         "color": "red",
         "id": "quit save",
         "func": {
@@ -332,6 +368,9 @@ options_home = [
 # Home menu prompt builder (display current configuration)
 def home_prompt():
     return "\n".join([
+        f"{coutput.get_print_string_text("====================================", color="white")}",
+        f"{coutput.get_print_string_text("DEBUG MODE: ", color="red")}{coutput.get_print_string_text(DEBUG_MODE, color="yellow")}",
+        f"{coutput.get_print_string_text("====================================", color="white")}",
         coutput.get_print_string_text("- SERIAL PORT:", color="red"),
         f"    {coutput.get_print_string_text("Connected to Arduino: ", color="white")}{coutput.get_print_string_text(port_name, color="yellow")}",
         coutput.get_print_string_text("- CURRENT CONFIGURATIONS:", color="red"),
