@@ -1,0 +1,17 @@
+LTspice 26.1.1 for Windows
+Circuit: D:\Coding_projects\EMG\PCB design\EMG\simulation\Virtual Ground.net
+Start Time: Fri Sep 25 22:04:38 2026
+solver = Normal
+Maximum thread count: 14
+tnom = 27
+temp = 27
+method = trap
+Direct Newton iteration succeeded in finding operating point.
+Total elapsed time: 0.215 seconds.
+Total iterations: 2121
+
+Files loaded:
+D:\Coding_projects\EMG\PCB design\EMG\simulation\Virtual Ground.net
+C:\Users\Jiaqi\AppData\Local\LTspice\lib\sub\ADI1.lib
+C:\Users\Jiaqi\AppData\Local\LTspice\lib\sub\UniversalOpAmp2.lib
+

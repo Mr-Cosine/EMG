@@ -2,7 +2,9 @@
 #include "EmgFilters.h"
 #include "blur.h"
 
-#define SENSOR_INPUT_PIN A1 // input pin number
+#define ADCdebug true
+
+#define SENSOR_INPUT_PIN A0 // input pin number
 
 EMGFilters myFilter;
 // discrete filters must works with fixed sample frequence
@@ -15,6 +17,8 @@ int sampleRate = 1000;
 // our emg filter only support 50Hz and 60Hz input
 // other inputs will bypass all the EMG_FILTER
 int humFreq = 60;
+
+float adjust_factor = 20.0;
 
 // Calibration:
 // put on the sensors, and release your muscles;
@@ -53,20 +57,17 @@ void setup() {
 void loop() {
     if (sampleReady) {
         sampleReady = false;
-        int filtered = myFilter.filter(raw);
-        long envelope = abs((long)filtered);
+        int filtered = raw;
+        long envelope = abs((long)filtered) * adjust_factor;
         envelope = (envelope > Throhold) ? envelope : 0;
 
         static int printCounter = 0;
         if (++printCounter >= sampleEvery) {
             printCounter = 0;
-            Serial.print("Raw:");
-            Serial.println(raw);
-            Serial.print(",");
-            Serial.print("Envelope:");
-            Serial.print(envelope);
-            Serial.print(",");
-            Serial.print("Blurred:");
+            Serial.print("Min: 0, "); 
+            Serial.print("Max: 800, "); 
+
+            if (ADCdebug) Serial.println(envelope);
             inputWindow.update(envelope);
             Serial.println(gblur.blur(inputWindow));
         }

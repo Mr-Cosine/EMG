@@ -73,8 +73,8 @@ def set_serial():
     port_name_temp = UI.print_selections(f"Select from the following port(check Arduino IDE for board connection):", options)
     try:
         port_temp = Serial(port_name_temp, 9600, timeout=5)
-    except Exception:
-        coutput.print("Connection failed, please retry.", color="red")
+    except Exception as e:
+        coutput.print(f"Connection failed: {e}, please retry.", color="red")
         UI.safe_input("Press enter to return.")
         return
 
