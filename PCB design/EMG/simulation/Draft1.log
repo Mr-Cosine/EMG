@@ -1,0 +1,17 @@
+LTspice 26.1.1 for Windows
+Circuit: D:\Coding_projects\EMG\PCB design\EMG\simulation\Draft1.net
+Start Time: Wed Sep 30 19:12:40 2026
+solver = Normal
+Maximum thread count: 14
+tnom = 27
+temp = 27
+method = trap
+WARNING: Node n002 is floating.
+
+Direct Newton iteration succeeded in finding operating point.
+Total elapsed time: 0.275 seconds.
+Total iterations: 2091
+
+Files loaded:
+D:\Coding_projects\EMG\PCB design\EMG\simulation\Draft1.net
+

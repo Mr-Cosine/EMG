@@ -12,9 +12,10 @@ class gaussian_blur {
     private:
         float* kernel = nullptr;
         int kernel_size = 0;
+        int blur_window_len = 0;
 
-
-        void create_kernel() {
+        void _create_kernel(int new_size) {
+            this->kernel_size = new_size
             delete[] kernel;
             kernel = new float[this->kernel_size];
 
@@ -39,12 +40,9 @@ class gaussian_blur {
         
         template <typename QueueType, int N>
         QueueType blur(const Queue<QueueType, N>& data_stream) {         
-            int data_length = (int)data_stream.size();
+            this->blur_window_len = (int)data_stream.size();
 
-            if (data_length != this->kernel_size) {
-                this->kernel_size = data_length;
-                create_kernel();
-            }
+            if (blur_window_len != this->kernel_size) this->_create_kernel(data_length);
 
             float result = 0.0f;
             for (int i = 0; i < this->kernel_size; i++) {
@@ -52,6 +50,13 @@ class gaussian_blur {
             }
 
             return (QueueType)result;
+        } 
+
+        int window_len() return this->blur_window_len;
+
+        void create_kernel(float GBLUR_SIGMA) { 
+            this->kernel_size = GBLUR_SIGMA*6+1; 
+            this->_create_kernel(this->kernel_size);
         }
 };
 

@@ -40,11 +40,11 @@ void sampleISR() {
 
 gaussian_blur<float> gblur;
 const float GBLUR_SIGMA = 1.0;
-const int windowLen = GBLUR_SIGMA*6+1;
-Queue<long, windowLen> inputWindow;
+gblur.create_kernel(GBLUR_SIGMA);
+Queue<long, glur.window_len()> inputWindow;
 
 void setup() {
-    myFilter.init(sampleRate, humFreq, true, true, true);
+    myFilter.init(sampleRate, humFreq, false, false, true);
     Serial.begin(9600);
     Timer1.initialize(1000); // 1000 microseconds = 1000 Hz
     Timer1.attachInterrupt(sampleISR);
