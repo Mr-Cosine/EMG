@@ -1,5 +1,5 @@
-#ifndef _CONSTANTS_H
-#define _CONSTANTS_H
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
 // coefficients of transfer function of LPF
 // coef[sampleFreqInd][order]

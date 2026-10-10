@@ -1,5 +1,5 @@
 #include <TimerOne.h> // install via Library Manager
-#include "EmgFilters.h"
+#include "EMGFilters.h"
 #include "blur.h"
 
 #define ADCdebug true
@@ -38,13 +38,12 @@ void sampleISR() {
     sampleReady = true;
 }
 
-gaussian_blur<float> gblur;
-const float GBLUR_SIGMA = 1.0;
-gblur.create_kernel(GBLUR_SIGMA);
-Queue<long, glur.window_len()> inputWindow;
+constexpr float GBLUR_SIGMA = 1.0;
+gaussian_blur<float> gblur(GBLUR_SIGMA);
+Queue<long, gblur.window_len()> inputWindow;
 
 void setup() {
-    myFilter.init(sampleRate, humFreq, false, false, true);
+    myFilter.init(sampleRate, humFreq, true, true, true);
     Serial.begin(9600);
     Timer1.initialize(1000); // 1000 microseconds = 1000 Hz
     Timer1.attachInterrupt(sampleISR);
@@ -57,9 +56,9 @@ void setup() {
 void loop() {
     if (sampleReady) {
         sampleReady = false;
-        int filtered = raw;
+        int filtered = myFilter.filter(raw);
         long envelope = abs((long)filtered) * adjust_factor;
-        envelope = (envelope > Throhold) ? envelope : 0;
+        inputWindow.update(envelope);
 
         static int printCounter = 0;
         if (++printCounter >= sampleEvery) {
@@ -68,7 +67,6 @@ void loop() {
             Serial.print("Max: 800, "); 
 
             if (ADCdebug) Serial.println(envelope);
-            inputWindow.update(envelope);
             Serial.println(gblur.blur(inputWindow));
         }
     }

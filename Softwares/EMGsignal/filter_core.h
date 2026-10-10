@@ -1,5 +1,5 @@
-#ifndef _FILTERS_H
-#define _FILTERS_H
+#ifndef FILTERS_H
+#define FILTERS_H
 #include "constants.h"
 
 // second-order filter

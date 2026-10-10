@@ -1,6 +1,6 @@
-#ifndef _EMGFILTERS_H
-#define _EMGFILTERS_H
-#include "Filters.h"
+#ifndef EMGFILTERS_H
+#define EMGFILTERS_H
+#include "filter_core.h"
 #include "constants.h"
 
 class EMGFilters {

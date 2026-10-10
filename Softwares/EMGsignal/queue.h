@@ -1,5 +1,7 @@
-#ifndef _QUEUE_H
-#define _QUEUE_H
+#ifndef QUEUE_H
+#define QUEUE_H
+
+#include <stddef.h>
 
 template <typename T, int CAPACITY>
 class Queue {

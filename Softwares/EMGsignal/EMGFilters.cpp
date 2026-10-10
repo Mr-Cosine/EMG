@@ -36,7 +36,6 @@ int EMGFilters::filter(int inputValue) {
     if (m_lowpassFilterEnabled) output = LPF.process(output);
     // notch filter -> filter hum
     if (m_notchFilterEnabled) output = AHF.process(output);
-    else output = inputValue;
 
     return output;
 }
