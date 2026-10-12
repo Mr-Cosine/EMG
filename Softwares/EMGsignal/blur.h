@@ -3,10 +3,7 @@
 
 #include <math.h>
 #include "queue.h"
- 
-#ifndef M_PI
-#define M_PI 3.14159265358979
-#endif
+#include "constants.h"
  
 template <typename Number>
 class gaussian_blur {

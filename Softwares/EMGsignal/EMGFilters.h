@@ -15,17 +15,18 @@ class EMGFilters {
     void init(
               int   sampleFreq,
               int   notchFreq,
-              bool  enableNotchFilter    = true,
-              bool  enableLowpassFilter  = true,
-              bool  enableHighpassFilter = true
+              bool  bypass                = false,
+              bool  enableNotchFilter     = true,
+              bool  enableLowpassFilter   = true,
+              bool  enableHighpassFilter  = true
             );
 
-    int filter(int inputValue);
+    int process(int inputValue);
 
   private:
-    FILTER_2nd LPF;
-    FILTER_2nd HPF;
-    FILTER_4th AHF;
+    LOW_PASS LPF;
+    HIGH_PASS HPF;
+    NOTCH_FILTER AHF;
 
     int   m_sampleFreq;
     int   m_notchFreq;

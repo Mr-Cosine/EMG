@@ -7,16 +7,11 @@
 #define SENSOR_INPUT_PIN A0 // input pin number
 
 EMGFilters myFilter;
-// discrete filters must works with fixed sample frequence
-// our emg filter only support "SAMPLE_FREQ_500HZ" or "SAMPLE_FREQ_1000HZ"
-// other sampleRate inputs will bypass all the EMG_FILTER
-int sampleRate = 1000;
+// discrete filters must works with fixed sample frequency, adjust in constant.h
 // For countries where power transmission is at 50 Hz
-// For countries where power transmission is at 60 Hz, need to change to
-// "NOTCH_FREQ_60"
+// For countries where power transmission is at 60 Hz, need to change to NOTCH_FREQ_60"
 // our emg filter only support 50Hz and 60Hz input
 // other inputs will bypass all the EMG_FILTER
-int humFreq = 60;
 
 float adjust_factor = 20.0;
 
@@ -40,17 +35,13 @@ void sampleISR() {
 
 constexpr float GBLUR_SIGMA = 1.0;
 gaussian_blur<float> gblur(GBLUR_SIGMA);
-Queue<long, gblur.window_len()> inputWindow;
+Queue<long, gblur.window_len()> inputWindow(0);
 
 void setup() {
     myFilter.init(sampleRate, humFreq, true, true, true);
     Serial.begin(9600);
     Timer1.initialize(1000); // 1000 microseconds = 1000 Hz
     Timer1.attachInterrupt(sampleISR);
-    
-    for (int i = 0; i < inputWindow.size(); i++) {
-        inputWindow.update(0.0);
-    }
 }
 
 void loop() {

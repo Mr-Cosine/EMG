@@ -3,30 +3,26 @@
 void EMGFilters::init(
                      int    sampleFreq,
                      int    notchFreq,
+                     bool   bypass,
                      bool   enableNotchFilter,
                      bool   enableLowpassFilter,
                      bool   enableHighpassFilter) {
     m_sampleFreq = sampleFreq;
     m_notchFreq  = notchFreq;
-    m_bypassEnabled = true;
 
-    // If parameter valid, use the filter
-    if (((sampleFreq == 500) || (sampleFreq == 1000)) &&
-        ((notchFreq == 50) || (notchFreq == 60))) {
-            m_bypassEnabled = false;
-    }
+    m_bypassEnabled = bypass;
 
-    LPF.init(LOWPASS, m_sampleFreq);
-    HPF.init(HIGHPASS, m_sampleFreq);
-    AHF.init(m_sampleFreq, m_notchFreq);
+    LPF.init();
+    HPF.init();
+    AHF.init();
 
     m_notchFilterEnabled    = enableNotchFilter;
     m_lowpassFilterEnabled  = enableLowpassFilter;
     m_highpassFilterEnabled = enableHighpassFilter;
 }
 
-int EMGFilters::filter(int inputValue) {
-    if (m_bypassEnabled) return inputValue;
+int EMGFilters::process(int inputValue) {
+    if (this->m_bypassEnabled) return inputValue;
 
     int output = inputValue;
 
