@@ -7,24 +7,15 @@
 
 #define SENSOR_INPUT_PIN A0 // input pin number
 
-EMGFilters<double> myFilter;
-// discrete filters must works with fixed sample frequency, adjust in constant.h
-// For countries where power transmission is at 50 Hz
-// For countries where power transmission is at 60 Hz, need to change to NOTCH_FREQ_60"
-// our emg filter only support 50Hz and 60Hz input
-// other inputs will bypass all the EMG_FILTER
-
-double amplification_factor = 2.0;
-
 // Calibration:
 // put on the sensors, and release your muscles;
-// wait a few seconds, and select the max value as the throhold;
+// wait a few seconds, and select the max value as the threshold;
 // any value under throhold will be set to zero
-static int Throhold = 0;
+static int floor_signal = 0;
 
 unsigned long timeStamp;
-unsigned long timeBudget;
 
+// How frequent datas are printed (rate = sample_freq / print_every)
 const int print_every = 10;
 int print_counter = 0;
 
@@ -36,14 +27,15 @@ void sampleISR() {
     sampleReady = true;
 }
 
-constexpr double GBLUR_SIGMA = 1.0;
-constexpr int GBLUR_LENGTH = (int)(GBLUR_SIGMA * gb_factor) + 1;
+EMGFilters<double> myFilter;
+
+static constexpr int GBLUR_LENGTH = (int)(2 * GBLUR_SPAN) + 1;
 Gaussian_blur<double, GBLUR_LENGTH> gblur(true, double(0));
 
 void setup() {
     myFilter.init(false, true, true, true);
     Serial.begin(115200);
-    Timer1.initialize((int)(1e6 / sample_freq));
+    Timer1.initialize((int)(1e6 / sample_freq - process_time_budget));
     Timer1.attachInterrupt(sampleISR);
 }
 
@@ -51,7 +43,10 @@ void loop() {
     if (sampleReady) {
         sampleReady = false;
         double filtered = myFilter.process(raw);
-        double envelope = abs((double)filtered) * amplification_factor;
+
+        double envelope = abs((double)filtered) * amplification_factor - floor_signal;
+        if (envelope < 0) envelope = 0.0;
+
         long blurred = (long)(gblur.blur(envelope));
         
         if (++print_counter == print_every) {

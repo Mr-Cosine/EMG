@@ -32,17 +32,13 @@ The digital stages match the analog front end in `Electronics/EMG sensor front e
 
 ```
 ADC (Timer1 ISR @ sample_freq)
-   │
-   ▼
+   ↓
 High-pass 20 Hz ─► Low-pass 500 Hz ─► Notch hum_freq + 2×hum_freq      (EMGFilters.h)
-   │
-   ▼
+   ↓
 Rectify(absolute value) × amplification_factor (arduino sketch)
-   │
-   ▼
+   ↓
 Gaussian blur (arduino sketch & blur.h)
-   │
-   ▼
+   ↓
 Output
 ```
 
@@ -58,17 +54,24 @@ Minimal use of the filter chain on its own:
 
 ```cpp
 #include "EMGFilters.h"
+#include "Arduino.h"
+
+#define SENSOR_INPUT_PIN A0 // input pin number
 
 EMGFilters<double> filter;
 
 void setup() {
     // bypass_all, enable_notch, enable_lopass, enable_hipass
     filter.init(false, true, true, true);
+
+    Serial.begin(115200);   // Depends on your printing rate.
 }
 
 void loop() {
+    raw = analogRead(SENSOR_INPUT_PIN);
     // must be called exactly once per sample, at sample_freq
-    double clean = filter.process(analogRead(A0));
+    double filtered = filter.process(raw);
+    Serial.println(filtered);
 }
 ```
 
@@ -76,24 +79,20 @@ void loop() {
 
 All filters are designed for a fixed sample rate. Configurations for sample frequency, cutoff frequencies, notch frequency are done by altering the values in constants.h.
 
-| Constant       | Default | Meaning |
-|----------------|---------|---------|
-| `sample_freq`  | 2000    | Sample rate in Hz. Must be more than twice `lpf_cutoff`. The sketch's Timer1 period is derived from it. |
-| `filter_order` | 2       | Butterworth order for both the HPF and LPF. |
-| `hpf_cutoff`   | 20      | High-pass cutoff (Hz). Removes motion artifacts and baseline drift. |
-| `lpf_cutoff`   | 500     | Low-pass cutoff (Hz). The upper edge of the useful surface-EMG band. |
-| `hum_freq`     | 60      | Power-line frequency: `60` for North America and parts of Asia, `50` for most other regions. |
-| `gb_factor`    | 6.0     | How many sigmas the Gaussian window spans (6 means ±3σ). |
+| Constant              | Default   | Meaning |
+|-----------------------|-----------|---------|
+| `sample_freq`         | 2000      | Sample rate in Hz. Must be more than twice `lpf_cutoff`. The sketch's Timer1 period is derived from it. |
+| `process_time_budget` | 200       | The estimated time in microsecond took for process one signal. |
+| `filter_order`        | 2         | Butterworth order for both the HPF and LPF. The higher the better the filtering, but costs more time. |
+| `hpf_cutoff`          | 20        | High-pass cutoff (Hz). |
+| `lpf_cutoff`          | 500       | Low-pass cutoff (Hz). |
+| `hum_freq`            | 60        | Power-line frequency: `60` for North America and parts of Asia, `50` for China and most other regions. |
+| `GBLUR_SPAN`          | 6.0       | How many sigmas the Gaussian window spans on one side (3 means ±3σ). |
+| `amplification_factor`| 2.0       | Gain applied after rectification. |
 
 A cutoff must be strictly between 0 and `sample_freq / 2`. Otherwise that Butterworth stage is left with zero coefficients and outputs 0.
-
-In the sketch (`EMGsignal.ino`):
-
-| Setting         | Meaning |
-|-----------------|---------|
-| `GBLUR_SIGMA`   | Gaussian sigma, in samples. The window length is `sigma × gb_factor + 1` (7 samples by default). A larger sigma gives a smoother envelope but more lag. |
-| `adjust_factor` | Gain applied after rectification. |
-| `print_every`   | Prints one value per N samples, so the serial link is not flooded (200 values/s by default). |
+The print data rate must stay within baud rate. 115200 is recommended.
+gb_factor must be even integer.
 
 ## API reference: ##
 
