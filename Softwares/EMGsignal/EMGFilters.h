@@ -24,9 +24,9 @@ class EMGFilters {
     int process(int inputValue);
 
   private:
-    LOW_PASS LPF;
-    HIGH_PASS HPF;
-    NOTCH_FILTER AHF;
+    Lopass LPF;
+    Hipass HPF;
+    Notch AHF;
 
     int   m_sampleFreq;
     int   m_notchFreq;

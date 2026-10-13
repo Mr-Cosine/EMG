@@ -14,7 +14,7 @@ void EMGFilters::init(
 
     LPF.init();
     HPF.init();
-    AHF.init();
+    AHF.init(30.0);
 
     m_notchFilterEnabled    = enableNotchFilter;
     m_lowpassFilterEnabled  = enableLowpassFilter;

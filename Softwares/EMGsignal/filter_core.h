@@ -2,10 +2,10 @@
 #define FILTERS_H
 #include "constants.h"
 #include "queue.h"
-#include "math.h"
-#include "complex.h"
+#include <cmath>
+#include <complex>
 
-class BUTTERWORTH {
+class Butterworth {
     private:
         typedef std::complex<double> cd;
 
@@ -14,17 +14,23 @@ class BUTTERWORTH {
         double a[filter_order + 1];
         double b[filter_order + 1];
 
-        static void polyFromRoots(const cd* roots, int n, cd* c) {
+        void _create_kernel(const cd* roots, int n, double res[]) {
+            cd c[filter_order + 1];
+
             c[0] = cd(1.0, 0.0);
             for (int i = 1; i <= n; ++i) c[i] = cd(0.0, 0.0);
 
             for (int k = 0; k < n; ++k) {
                 for (int i = k + 1; i >= 1; --i) c[i] -= roots[k] * c[i - 1];
             }
+
+            for (int i = 0; i <= filter_order; i++) {
+                res[i] = c[i].real();
+            }
         }
 
     public:
-        BUTTERWORTH() { 
+        Butterworth() { 
             for (int i = 0; i <= filter_order; ++i) { a[i] = 0.0; b[i] = 0.0; }
             a[0] = 1.0;
             b[0] = 1.0;
@@ -61,20 +67,14 @@ class BUTTERWORTH {
 
                 poles[k - 1]     = pk;
                 zeros[k - 1] = cd(zero, 0.0);
-                prod *= (cd(1.0, 0.0) - pk);
+                prod *= (cd(1.0, 0.0) + pk * zero);
             }
 
             const double G = prod.real() / std::pow(2.0, filter_order);
 
-            cd bc[filter_order + 1];
-            cd ac[filter_order + 1];
-            this->polyFromRoots(zeros, filter_order, bc);
-            this->polyFromRoots(poles, filter_order, ac);
-
-            for (int i = 0; i <= filter_order; ++i) {
-                b[i] = G * bc[i].real();
-                a[i] = ac[i].real();
-            }
+            this->_create_kernel(zeros, filter_order, b);
+            this->_create_kernel(poles, filter_order, a);
+            for (int i = 0; i <= filter_order; ++i) b[i] *= G;
 
             this->clear_state();
         }
@@ -93,69 +93,91 @@ class BUTTERWORTH {
         }
 };
 
-class LOW_PASS : public BUTTERWORTH {
+class Lopass : public Butterworth {
     public:
         void init() {
-            BUTTERWORTH::init(lpf_cutoff, false);
+            Butterworth::init(lpf_cutoff, true);
         }
 };
 
-class HIGH_PASS : public BUTTERWORTH {
+class Hipass : public Butterworth {
     public:
         void init() {
-            BUTTERWORTH::init(hpf_cutoff, false);
+            Butterworth::init(hpf_cutoff, false);
         }
 };
 
-class NOTCH_FILTER {
-  private:
-    float states[notch_order];
-    float stage1_num[notch_order - 1];
-    float stage2_num[notch_order - 1];
-    float stage1_den[notch_order - 1];
-    float stage2_den[notch_order - 1];
-    float gain;
+class Notch {
+    class Core {
+        private:
+            double a[3];
+            double b[3];
+            Queue<double, 2> state;
 
-    static void designSection(double fs, double f0, double Q, float* n, float* d) {
-        const double w0   = 2.0 * M_PI * f0 / fs;       // notch angle (radians/sample)
-        const double beta = std::tan(w0 / (2.0 * Q));   // sets the notch width
-        const double g    = 1.0 / (1.0 + beta);
-        const double c    = 2.0 * std::cos(w0);
- 
-        n[0] = (float)g;                     // b0
-        n[1] = (float)(-c * g);              // b1
-        n[2] = (float)g;                     // b2
-        d[0] = 1.0f;
-        d[1] = (float)(-c * g);              // a1
-        d[2] = (float)((1.0 - beta) * g);    // a2
-    }
- 
-  public:
-    void clear_state() {
-        for (int i = 0; i < 4; i++) states[i] = 0;
-    }
- 
-    void init(double Q = 30.0) {
-    }
- 
-    float process(float input) {
-        float output;
-        float stageIn;
-        float stageOut;
- 
-        stageOut  = stage1_num[0] * input + states[0];
-        states[0] = (stage1_num[1] * input + states[1]) - stage1_den[1] * stageOut;
-        states[1] = stage1_num[2] * input - stage1_den[2] * stageOut;
-        stageIn   = stageOut;
-        stageOut  = stage2_num[0] * stageOut + states[2];
-        states[2] = (stage2_num[1] * stageIn + states[3]) - stage2_den[1] * stageOut;
-        states[3] = stage2_num[2] * stageIn - stage2_den[2] * stageOut;
- 
-        output = gain * stageOut;
- 
-        return output;
-    }
+        public:
+            Core():
+            state(double(0))            
+            {
+                for (int i = 0; i < 3; i++) { 
+                    this->a[i] = 0.0;
+                    this->b[i] = 0.0;
+                }
+                
+                this->clear_state();
+            }
+
+            void clear_state() {
+                this->state.flush(0.0);
+            }
+
+            void init(int frequency, int freq_multiplier, double Q) {
+                const double w0   = 2.0 * M_PI * frequency * freq_multiplier / sample_freq;
+                const double beta = std::tan(w0 / (2.0 * Q));
+                const double g    = 1.0 / (1.0 + beta);
+                const double c    = 2.0 * std::cos(w0);
+
+                this->a[0] = 1.0f;
+                this->a[1] = (double)(-c * g);
+                this->a[2] = (double)((1.0 - beta) * g);
+    
+                this->b[0] = (double)g;                     
+                this->b[1] = (double)(-c * g);
+                this->b[2] = (double)g;
+
+            }
+
+            double process(double input) {
+                double output;
+                output  = b[0] * input + this->state[0];
+                this->state[0] = (this->b[1] * input + this->state[1]) - this->a[1] * output;
+                this->state[1] = this->b[2] * input - this->a[2] * output;
+
+                return output;
+            }
+    };
+
+    private:
+        Core base;
+        Core second_harmonic;
+
+    public:
+        Notch() {
+            this->clear_state();
+        }
+        void clear_state() {
+            this->base.clear_state();
+            this->second_harmonic.clear_state();
+        }
+
+        void init(double Q) {
+            base.init(hum_freq, 1, Q);
+            second_harmonic.init(hum_freq, 2, Q);
+        }   
+    
+        double process(double input) {
+            double output = base.process(input);
+            return second_harmonic.process(output);
+        }
 };
-
 
 #endif

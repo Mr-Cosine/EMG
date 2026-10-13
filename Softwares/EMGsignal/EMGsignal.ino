@@ -24,7 +24,7 @@ static int Throhold = 0;
 unsigned long timeStamp;
 unsigned long timeBudget;
 
-const int sampleEvery = 5;
+const int sampleEvery = 2;
 volatile bool sampleReady = false;
 volatile int raw = 0;
 
