@@ -5,6 +5,9 @@
 #define M_PI 3.14159265358979
 #endif
 
+// coefficient for blur window calculation
+static const double gb_factor = 6.0;
+
 // coefficients for LPF and HPF
 static const int filter_order = 2;
 static const int sample_freq = 2000;

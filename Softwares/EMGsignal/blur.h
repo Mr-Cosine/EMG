@@ -5,19 +5,15 @@
 #include "queue.h"
 #include "constants.h"
  
-template <typename Number>
-class gaussian_blur {
+template <typename dataType, int kernel_size>
+class Gaussian_blur {
     private:
-        float* kernel;
-        int kernel_size;
-        int blur_window_len;
+        double* kernel;
+        Queue<dataType, kernel_size> state;
  
-        void _create_kernel(int new_size) {
-            if (new_size < 1) new_size = 1;
- 
-            delete[] kernel;
-            kernel_size = new_size;
-            kernel = new float[kernel_size];
+        void _create_kernel() {
+            if (kernel != nullptr) delete[] kernel;
+            kernel = new double[kernel_size];
  
             // A single-sample kernel is just a pass-through (avoids sigma = 0).
             if (kernel_size == 1) {
@@ -25,14 +21,14 @@ class gaussian_blur {
                 return;
             }
  
-            float sigma = (kernel_size - 1) / 6.0f;
-            float coeff = 1.0f / (sigma * sqrtf(2.0f * (float)M_PI));
-            float x0 = (kernel_size - 1) / 2.0f;
+            double sigma = (kernel_size - 1) / gb_factor;
+            double coeff = 1.0 / (sigma * sqrt(2.0 * (float)M_PI));
+            double x0 = (kernel_size - 1.0) / 2.0;
  
-            float sum = 0.0f;
+            double sum = 0.0;
             for (int i = 0; i < kernel_size; i++) {
-                float x = i - x0;
-                kernel[i] = coeff * expf(-(x * x) / (2.0f * sigma * sigma));
+                double x = i - x0;
+                kernel[i] = coeff * exp(-(x * x) / (2.0 * sigma * sigma));
                 sum += kernel[i];
             }
             for (int i = 0; i < kernel_size; i++) {
@@ -41,37 +37,32 @@ class gaussian_blur {
         }
  
     public:
-        gaussian_blur(float GBLUR_SIGMA):
+        Gaussian_blur():
             kernel(nullptr),
-            kernel_size(0),
-            blur_window_len(0)
+            state(dataType(0))
         {
-            _create_kernel((int)(GBLUR_SIGMA * 6) + 1);
+            _create_kernel();
         }
  
-        gaussian_blur(const gaussian_blur&) = delete;
-        gaussian_blur& operator=(const gaussian_blur&) = delete;
+        Gaussian_blur(const gaussian_blur&) = delete;
+        Gaussian_blur& operator=(const gaussian_blur&) = delete;
  
-        ~gaussian_blur() {
-            delete[] kernel;
+        ~Gaussian_blur() {
+            if (this->kernel != nullptr) delete[] this->kernel;
         }
  
-        template <typename QueueType, int N>
-        QueueType blur(const Queue<QueueType, N>& data_stream) {
-            blur_window_len = data_stream.size();
-            if (blur_window_len == 0) return (QueueType)0;
- 
-            if (blur_window_len != kernel_size) _create_kernel(blur_window_len);
- 
-            float result = 0.0f;
+        dataType blur(dataType new_data) {
+            this->state.update(new_data);
+
+            double result = 0.0;
             for (int i = 0; i < kernel_size; i++) {
-                result += (float)data_stream[i] * kernel[i];
+                result += (double)state[i] * kernel[i];
             }
  
-            return (QueueType)result;
+            return (dataType)result;
         }
  
-        int window_len() const { return blur_window_len; }
+        static constexpr int blur_length() { return kernel_size; }
 };
  
 #endif

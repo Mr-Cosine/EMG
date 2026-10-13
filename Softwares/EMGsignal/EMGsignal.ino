@@ -34,8 +34,8 @@ void sampleISR() {
 }
 
 constexpr float GBLUR_SIGMA = 1.0;
-gaussian_blur<float> gblur(GBLUR_SIGMA);
-Queue<long, gblur.window_len()> inputWindow(0);
+constexpr int GBLUR_LENGTH = (int)(GBLUR_SIGMA * gb_factor) + 1;
+Gaussian_blur<long, GBLUR_LENGTH> gblur;
 
 void setup() {
     myFilter.init(sampleRate, humFreq, true, true, true);
@@ -49,7 +49,7 @@ void loop() {
         sampleReady = false;
         int filtered = myFilter.filter(raw);
         long envelope = abs((long)filtered) * adjust_factor;
-        inputWindow.update(envelope);
+        long blurred = gblur.blur(envelope);
 
         static int printCounter = 0;
         if (++printCounter >= sampleEvery) {
@@ -58,7 +58,7 @@ void loop() {
             Serial.print("Max: 800, "); 
 
             if (ADCdebug) Serial.println(envelope);
-            Serial.println(gblur.blur(inputWindow));
+            Serial.println(blurred);
         }
     }
 }
