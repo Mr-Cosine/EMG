@@ -37,15 +37,15 @@ class Gaussian_blur {
         }
  
     public:
-        Gaussian_blur():
+        Gaussian_blur(bool flush = true, dataType filler = dataType(0)):
             kernel(nullptr),
-            state(dataType(0))
+            state(flush, filler)
         {
             _create_kernel();
         }
  
-        Gaussian_blur(const gaussian_blur&) = delete;
-        Gaussian_blur& operator=(const gaussian_blur&) = delete;
+        Gaussian_blur(const Gaussian_blur&) = delete;
+        Gaussian_blur& operator=(const Gaussian_blur&) = delete;
  
         ~Gaussian_blur() {
             if (this->kernel != nullptr) delete[] this->kernel;

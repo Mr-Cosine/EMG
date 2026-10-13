@@ -2,23 +2,22 @@
 #define FILTERS_H
 #include "constants.h"
 #include "queue.h"
-#include <cmath>
-#include <complex>
+#include "complexf.h"
+#include <math.h>
+
 
 class Butterworth {
     private:
-        typedef std::complex<double> cd;
-
         Queue<double, filter_order+1> input_state;
         Queue<double, filter_order> output_state;
         double a[filter_order + 1];
         double b[filter_order + 1];
 
-        void _create_kernel(const cd* roots, int n, double res[]) {
-            cd c[filter_order + 1];
+        void _create_kernel(const Complexf* roots, int n, double res[]) {
+            Complexf c[filter_order + 1];
 
-            c[0] = cd(1.0, 0.0);
-            for (int i = 1; i <= n; ++i) c[i] = cd(0.0, 0.0);
+            c[0] = Complexf(1.0, 0.0);
+            for (int i = 1; i <= n; ++i) c[i] = Complexf(0.0, 0.0);
 
             for (int k = 0; k < n; ++k) {
                 for (int i = k + 1; i >= 1; --i) c[i] -= roots[k] * c[i - 1];
@@ -46,37 +45,36 @@ class Butterworth {
                 a[i] = 0.0; 
                 b[i] = 0.0; 
             }
+            this->clear_state();
 
             if (cutoff <= 0.0 || cutoff >= sample_freq / 2.0) return;
 
             const double K  = 2.0 * sample_freq;
-            const double Wc = K * std::tan(M_PI * cutoff / sample_freq);
+            const double Wc = K * tan(M_PI * cutoff / sample_freq);
 
-            cd poles[filter_order];
-            cd zeros[filter_order];
+            Complexf poles[filter_order];
+            Complexf zeros[filter_order];
 
-            cd prod(1.0, 0.0); 
+            Complexf prod(1.0, 0.0); 
 
             double zero = 1.0;
             if (is_lpf) zero = -1.0;
 
             for (int k = 1; k <= filter_order; ++k) {
                 const double theta = M_PI * (2.0 * k + filter_order - 1.0) / (2.0 * filter_order);
-                const cd s  = std::polar(1.0, theta) * Wc;
-                const cd pk = (K + s) / (K - s);
+                const Complexf s  = Complexf(Polar_coord(1.0, theta)) * Wc;
+                const Complexf pk = (K + s) / (K - s);
 
                 poles[k - 1]     = pk;
-                zeros[k - 1] = cd(zero, 0.0);
-                prod *= (cd(1.0, 0.0) + pk * zero);
+                zeros[k - 1] = Complexf(zero, 0.0);
+                prod *= (Complexf(1.0, 0.0) + pk * zero);
             }
 
-            const double G = prod.real() / std::pow(2.0, filter_order);
+            const double G = prod.real() / pow(2.0, filter_order);
 
             this->_create_kernel(zeros, filter_order, b);
             this->_create_kernel(poles, filter_order, a);
             for (int i = 0; i <= filter_order; ++i) b[i] *= G;
-
-            this->clear_state();
         }
 
         double process(double input) {
@@ -132,9 +130,9 @@ class Notch {
 
             void init(int frequency, int freq_multiplier, double Q) {
                 const double w0   = 2.0 * M_PI * frequency * freq_multiplier / sample_freq;
-                const double beta = std::tan(w0 / (2.0 * Q));
+                const double beta = tan(w0 / (2.0 * Q));
                 const double g    = 1.0 / (1.0 + beta);
-                const double c    = 2.0 * std::cos(w0);
+                const double c    = 2.0 * cos(w0);
 
                 this->a[0] = 1.0f;
                 this->a[1] = (double)(-c * g);

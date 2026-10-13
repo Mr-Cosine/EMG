@@ -1,17 +1,15 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include <stddef.h>
-
-template <typename T, int CAPACITY>
+template <typename dataType, int CAPACITY>
 class Queue {
     private:
-        T data[CAPACITY];
-        int head = 0;
-        int tail = 0;
-        int used_amount = 0; 
+        dataType data[CAPACITY];
+        int head;
+        int tail;
+        int used_amount;
 
-        void push(T value) {
+        void push(dataType value) {
             if (used_amount == CAPACITY) return;
 
             this->data[tail] = value;
@@ -27,31 +25,31 @@ class Queue {
         }
 
     public:
-        Queue(T filler = T(0)):
+        Queue(bool flush = false, dataType filler = dataType(0)):
             head(0),
             tail(0),
             used_amount(0)
         {
-            for (int i = 0; i < CAPACITY; i++) data[i] = filler;
+            if (flush) this->flush(filler);
         }
 
-        void update(T newValue) {
+        void update(dataType newValue) {
             if (isFull()) this->pop();
             this->push(newValue);
         }
 
-        void flush(T filler = T(0)) {
+        void flush(dataType filler = dataType(0)) {
             for (int _ = 0; _ < CAPACITY; _++) this->update(filler);
         }
 
-        T& operator[](int idx) { return data[(head + idx) % CAPACITY]; }
-        const T& operator[](int idx) const { return data[(head + idx) % CAPACITY]; }
+        dataType& operator[](int idx) { return data[(head + idx) % CAPACITY]; }
+        const dataType& operator[](int idx) const { return data[(head + idx) % CAPACITY]; }
 
         int size() { return this->used_amount; }
         int size() const { return this->used_amount; }
 
-        size_t capacity() { return CAPACITY; }
-        size_t capacity() const { return CAPACITY; }
+        int capacity() { return CAPACITY; }
+        int capacity() const { return CAPACITY; }
 
         bool isFull() { return this->used_amount == CAPACITY; }
         bool isFull() const { return this->used_amount == CAPACITY; }

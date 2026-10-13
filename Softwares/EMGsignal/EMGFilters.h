@@ -3,37 +3,43 @@
 #include "filter_core.h"
 #include "constants.h"
 
+template <typename dataType>
 class EMGFilters {
-  public:
-  /*
-  * @param sampleFreq only supports SAMPLE_FREQ_500HZ & SAMPLE_FREQ_1000HZ.
-  * @param notchFreq only supports NOTCH_FREQ_50HZ & NOTCH_FREQ_60HZ.
-  * @param enableNotchFilter enables the notch filter. True by default.
-  * @param enableLowpassFilter enables the lowpass filter. True by default.
-  * @param enableHighpassFilter enables the highpass filter. True by default.
-  */
-    void init(
-              int   sampleFreq,
-              int   notchFreq,
-              bool  bypass                = false,
-              bool  enableNotchFilter     = true,
-              bool  enableLowpassFilter   = true,
-              bool  enableHighpassFilter  = true
-            );
+    private:
+        Lopass LPF;
+        Hipass HPF;
+        Notch AHF;
 
-    int process(int inputValue);
+        bool  m_bypassEnabled;
+        bool  m_notchFilterEnabled;
+        bool  m_lowpassFilterEnabled;
+        bool  m_highpassFilterEnabled;
+        
+    public:
+        void init(bool bypass_all, bool enable_notch, bool enable_lopass, bool enable_hipass) {
 
-  private:
-    Lopass LPF;
-    Hipass HPF;
-    Notch AHF;
+            m_bypassEnabled = bypass_all;
 
-    int   m_sampleFreq;
-    int   m_notchFreq;
-    bool  m_bypassEnabled;
-    bool  m_notchFilterEnabled;
-    bool  m_lowpassFilterEnabled;
-    bool  m_highpassFilterEnabled;
+            LPF.init();
+            HPF.init();
+            AHF.init(30.0);
+
+            m_notchFilterEnabled    = enable_notch;
+            m_lowpassFilterEnabled  = enable_lopass;
+            m_highpassFilterEnabled = enable_hipass;
+        }
+
+        dataType process(dataType inputValue) {
+            if (this->m_bypassEnabled) return inputValue;
+
+            double output = (double)inputValue;
+
+            if (m_highpassFilterEnabled) output = HPF.process(output);
+            if (m_lowpassFilterEnabled) output = LPF.process(output);
+            if (m_notchFilterEnabled) output = AHF.process(output);
+
+            return (dataType)output;
+        }
 };
 
 #endif
