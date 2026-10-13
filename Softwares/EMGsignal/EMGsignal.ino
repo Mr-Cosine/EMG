@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include <TimerOne.h> // install via Library Manager
 #include "EMGFilters.h"
 #include "blur.h"
