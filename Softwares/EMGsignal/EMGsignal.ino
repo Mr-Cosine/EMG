@@ -30,7 +30,7 @@ void sampleISR() {
 EMGFilters<double> myFilter;
 
 static constexpr int GBLUR_LENGTH = (int)(2 * GBLUR_SPAN) + 1;
-Gaussian_blur<double, GBLUR_LENGTH> gblur(true, double(0));
+Gaussian_blur<double, GBLUR_LENGTH> gblur{true, double(0)};
 
 void setup() {
     myFilter.init(false, true, true, true);

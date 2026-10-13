@@ -87,12 +87,11 @@ All filters are designed for a fixed sample rate. Configurations for sample freq
 | `hpf_cutoff`          | 20        | High-pass cutoff (Hz). |
 | `lpf_cutoff`          | 500       | Low-pass cutoff (Hz). |
 | `hum_freq`            | 60        | Power-line frequency: `60` for North America and parts of Asia, `50` for China and most other regions. |
-| `GBLUR_SPAN`          | 6.0       | How many sigmas the Gaussian window spans on one side (3 means ±3σ). |
+| `GBLUR_SPAN`          | 3.0       | How many sigmas the Gaussian window spans on one side (3 means ±3σ). |
 | `amplification_factor`| 2.0       | Gain applied after rectification. |
 
 A cutoff must be strictly between 0 and `sample_freq / 2`. Otherwise that Butterworth stage is left with zero coefficients and outputs 0.
 The print data rate must stay within baud rate. 115200 is recommended.
-gb_factor must be even integer.
 
 ## API reference: ##
 
