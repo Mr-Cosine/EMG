@@ -2,3 +2,6 @@ motor_config.json
 *.spec
 build/
 dist/
+.venv/
+.claude/
+__pycache__/
