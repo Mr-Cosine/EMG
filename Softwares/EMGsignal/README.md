@@ -82,7 +82,6 @@ All filters are designed for a fixed sample rate. Configurations for sample freq
 | Constant              | Default   | Meaning |
 |-----------------------|-----------|---------|
 | `sample_freq`         | 2000      | Sample rate in Hz. Must be more than twice `lpf_cutoff`. The sketch's Timer1 period is derived from it. |
-| `process_time_budget` | 200       | The estimated time in microsecond took for process one signal. |
 | `filter_order`        | 2         | Butterworth order for both the HPF and LPF. The higher the better the filtering, but costs more time. |
 | `hpf_cutoff`          | 20        | High-pass cutoff (Hz). |
 | `lpf_cutoff`          | 500       | Low-pass cutoff (Hz). |

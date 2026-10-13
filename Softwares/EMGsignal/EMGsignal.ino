@@ -13,12 +13,12 @@
 // any value under throhold will be set to zero
 static int floor_signal = 0;
 
-unsigned long timeStamp;
-
 // How frequent datas are printed (rate = sample_freq / print_every)
 const int print_every = 10;
 int print_counter = 0;
 
+
+unsigned long timeStamp;
 volatile bool sampleReady = false;
 volatile double raw = 0;
 
@@ -35,7 +35,7 @@ Gaussian_blur<double, GBLUR_LENGTH> gblur{true, double(0)};
 void setup() {
     myFilter.init(false, true, true, true);
     Serial.begin(115200);
-    Timer1.initialize((int)(1e6 / sample_freq - process_time_budget));
+    Timer1.initialize((int)(1e6 / sample_freq));
     Timer1.attachInterrupt(sampleISR);
 }
 

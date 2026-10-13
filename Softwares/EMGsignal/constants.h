@@ -8,9 +8,6 @@
 // sampling frequency
 static const int sample_freq = 2000;
 
-// estimated process time
-static const int process_time_budget = 200;
-
 // coefficient for blur window calculation
 static constexpr int GBLUR_SPAN = 3;
 
