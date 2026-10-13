@@ -14,7 +14,7 @@ EMGFilters<double> myFilter;
 // our emg filter only support 50Hz and 60Hz input
 // other inputs will bypass all the EMG_FILTER
 
-double adjust_factor = 2.0;
+double amplification_factor = 2.0;
 
 // Calibration:
 // put on the sensors, and release your muscles;
@@ -51,7 +51,7 @@ void loop() {
     if (sampleReady) {
         sampleReady = false;
         double filtered = myFilter.process(raw);
-        double envelope = abs((double)filtered) * adjust_factor;
+        double envelope = abs((double)filtered) * amplification_factor;
         long blurred = (long)(gblur.blur(envelope));
         
         if (++print_counter == print_every) {
