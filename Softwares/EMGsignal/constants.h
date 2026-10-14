@@ -20,6 +20,6 @@ static const int hpf_cutoff = 20;
 static const int hum_freq = 60;
 
 // How much the processed signal is scaled
-double amplification_factor = 2.0;
+static const double amplification_factor = 2.0;
 
 #endif

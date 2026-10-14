@@ -20,10 +20,10 @@ int print_counter = 0;
 
 unsigned long timeStamp;
 volatile bool sampleReady = false;
-volatile double raw = 0;
+volatile double adc = 0;
 
 void sampleISR() {
-    raw = (double)(analogRead(SENSOR_INPUT_PIN));
+    adc = (double)(analogRead(SENSOR_INPUT_PIN));
     sampleReady = true;
 }
 
@@ -35,13 +35,16 @@ Gaussian_blur<double, GBLUR_LENGTH> gblur{true, double(0)};
 void setup() {
     myFilter.init(false, true, true, true);
     Serial.begin(115200);
-    Timer1.initialize((int)(1e6 / sample_freq));
+    Timer1.initialize((unsigned long)(1e6 / sample_freq));
     Timer1.attachInterrupt(sampleISR);
 }
 
 void loop() {
     if (sampleReady) {
-        sampleReady = false;
+        noInterrupts();
+        double raw = adc;
+        interrupts();
+
         double filtered = myFilter.process(raw);
 
         double envelope = abs((double)filtered) * amplification_factor - floor_signal;
@@ -58,5 +61,7 @@ void loop() {
             if (ADCdebug) Serial.println(raw);
             else Serial.println(blurred);
         }
+
+        sampleReady = false;
     }
 }

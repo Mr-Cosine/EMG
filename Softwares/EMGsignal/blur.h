@@ -21,7 +21,7 @@ class Gaussian_blur {
                 return;
             }
  
-            double sigma = (kernel_size - 1) / GBLUR_SPAN;
+            double sigma = (kernel_size - 1) / (2.0 * GBLUR_SPAN);
             double coeff = 1.0 / (sigma * sqrt(2.0 * (float)M_PI));
             double x0 = (kernel_size - 1.0) / 2.0;
  
