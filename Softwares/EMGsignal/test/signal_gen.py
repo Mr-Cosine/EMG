@@ -36,13 +36,12 @@ n_samples = round(duration * rate)
 
 filter_program = "../build/filter_exported.exe"
 
-# Sine wave parameters
-sine_freq = 10        # Hz
-sine_amplitude = 256.0
-sine_offset = 512.0     # mid-scale of a 10-bit ADC
-
 # Test data generator
 def signal(t_us: int) -> float:
+    sine_freq = 10   # Hz
+    sine_amplitude = 256.0
+    sine_offset = 512.0
+
     # Signal versus time
     return sine_offset + sine_amplitude * math.sin(2 * math.pi * sine_freq * t_us / 1_000_000)
 
