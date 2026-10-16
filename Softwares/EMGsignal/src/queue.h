@@ -1,13 +1,15 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
+#include "types.h"
+
 template <typename dataType, int CAPACITY>
 class Queue {
     private:
         dataType data[CAPACITY];
-        int head;
-        int tail;
-        int used_amount;
+        i32 head;
+        i32 tail;
+        i32 used_amount;
 
         void push(dataType value) {
             if (used_amount == CAPACITY) return;
@@ -39,17 +41,17 @@ class Queue {
         }
 
         void flush(dataType filler = dataType(0)) {
-            for (int _ = 0; _ < CAPACITY; _++) this->update(filler);
+            for (i32 _ = 0; _ < CAPACITY; _++) this->update(filler);
         }
 
-        dataType& operator[](int idx) { return data[(head + idx) % CAPACITY]; }
-        const dataType& operator[](int idx) const { return data[(head + idx) % CAPACITY]; }
+        dataType& operator[](i32 idx) { return data[(head + idx) % CAPACITY]; }
+        const dataType& operator[](i32 idx) const { return data[(head + idx) % CAPACITY]; }
 
-        int size() { return this->used_amount; }
-        int size() const { return this->used_amount; }
+        i32 size() { return this->used_amount; }
+        i32 size() const { return this->used_amount; }
 
-        int capacity() { return CAPACITY; }
-        int capacity() const { return CAPACITY; }
+        i32 capacity() { return CAPACITY; }
+        i32 capacity() const { return CAPACITY; }
 
         bool isFull() { return this->used_amount == CAPACITY; }
         bool isFull() const { return this->used_amount == CAPACITY; }

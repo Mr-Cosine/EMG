@@ -22,7 +22,7 @@ The digital stages match the analog front end in `Electronics/EMG sensor front e
 ## Processing Workflow: ##
 
 ```
-ADC (Timer1 ISR @ sample_freq)
+ADC (ESP32 hardware timer @ sample_freq)
    ↓
 High-pass 20 Hz ─► Low-pass 500 Hz ─► Notch hum_freq + 2×hum_freq      (EMGFilters.h)
    ↓
@@ -35,7 +35,7 @@ Output
 
 ## Quick start: ##
 
-1. Install **TimerOne** from the Arduino Library Manager. The example sketch uses it for fixed-rate sampling.
+1. Install the **esp32** board package (Espressif) from the Arduino Boards Manager. The example sketch uses the ESP32 hardware timer for fixed-rate sampling, and works with both the 2.x and 3.x cores.
 2. Set `sample_freq` and `hum_freq` in `constants.h` to match your setup (see below).
 3. Connect the EMG front-end output to `A0` (or change `SENSOR_INPUT_PIN`).
 4. Open `EMGsignal.ino`, upload it, and open the Serial Plotter at **115200 baud**.
@@ -72,7 +72,7 @@ All filters are designed for a fixed sample rate. Configurations for sample freq
 
 | Constant              | Default   | Meaning |
 |-----------------------|-----------|---------|
-| `sample_freq`         | 2000      | Sample rate in Hz. Must be more than twice `lpf_cutoff`. The sketch's Timer1 period is derived from it. |
+| `sample_freq`         | 2000      | Sample rate in Hz. Must be more than twice `lpf_cutoff`. The sketch's hardware timer period is derived from it. |
 | `filter_order`        | 2         | Butterworth order for both the HPF and LPF. The higher the better the filtering, but costs more time. |
 | `hpf_cutoff`          | 20        | High-pass cutoff (Hz). |
 | `lpf_cutoff`          | 500       | Low-pass cutoff (Hz). |
@@ -135,4 +135,4 @@ Lightweight complex number type used to place the filter poles.
 
 - On 8-bit AVR boards (Uno, Nano, Mega), `double` is the same 32-bit type as `float`, so precision is single-precision there. This is fine at the default 2nd order. At higher orders or very low cutoff/sample-rate ratios, check the response.
 - The sketch drops samples silently if `loop()` takes longer than one sample period, because the ISR only sets a flag. If you add heavy processing or printing, lower `sample_freq` or `print_every` accordingly.
-- `TimerOne` supports AVR and Teensy boards. On other boards, replace it with an equivalent hardware timer.
+- The example sketch targets ESP32 (`hw_timer_t`, `IRAM_ATTR`). On other boards, replace the timer setup with that board's hardware timer (e.g. `TimerOne` on AVR). The filter headers in `src/` themselves are board-independent.

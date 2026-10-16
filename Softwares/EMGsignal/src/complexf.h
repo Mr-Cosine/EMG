@@ -2,14 +2,15 @@
 #define COMPLEXF_H
 
 #include <math.h>
+#include "types.h"
 
-inline bool is_equal(const double& a, const double& b) { return fabs(a - b) < 1e-5; }
+inline bool is_equal(const f32& a, const f32& b) { return fabsf(a - b) < 1e-5f; }
 
 struct Polar_coord {
-    double r;
-    double theta;
+    f32 r;
+    f32 theta;
 
-    Polar_coord(double new_r, double new_theta) {
+    Polar_coord(f32 new_r, f32 new_theta) {
         r = new_r;
         theta = new_theta;
     }
@@ -17,38 +18,42 @@ struct Polar_coord {
 
 class Complexf {
     private:
-        double rval;
-        double ival;
+        f32 rval;
+        f32 ival;
 
     public:
-        Complexf(double r = 0.0, double i = 0.0):
+        // Constructors
+        Complexf(f32 r = 0.0f, f32 i = 0.0f):
         rval(r),
         ival(i)
         {}
 
         Complexf(const Complexf& c):
-        rval(0.0),
-        ival(0.0)
+        rval(0.0f),
+        ival(0.0f)
         {
             this->rval = c.real();
             this->ival = c.imaginary();
         }
 
         Complexf(Polar_coord c):
-        rval(c.r * cos(c.theta)),
-        ival(c.r * sin(c.theta))
+        rval(c.r * cosf(c.theta)),
+        ival(c.r * sinf(c.theta))
         {}
 
-        double real() const { return this->rval; }
-        double imaginary() const { return this->ival; }
+        // Getter
+        f32 real() const { return this->rval; }
+        f32 imaginary() const { return this->ival; }
 
+        // Conjugate pairs
         Complexf conjugate() const { Complexf result(this->rval, -this->ival); return result; }
         static Complexf conjugate(const Complexf& num) { Complexf result(num.real(), -num.imaginary()); return result; }
 
         bool is_conjugate(const Complexf& num) const { return (is_equal(this->rval, num.real()) && is_equal(this->ival, -num.imaginary())); }
         static bool is_conjugate(const Complexf& n1, const Complexf& n2)  { return (is_equal(n1.real(), n2.real()) && is_equal(n1.imaginary(), -n2.imaginary())); }
         
-        Complexf operator + (const double& k) const {
+        // Operators
+        Complexf operator + (const f32& k) const {
             Complexf result(
                 this->rval + k, 
                 this->ival
@@ -63,7 +68,7 @@ class Complexf {
             return result;
         }
 
-        Complexf operator - (const double& k) const {
+        Complexf operator - (const f32& k) const {
             Complexf result(
                 this->rval - k, 
                 this->ival
@@ -78,7 +83,7 @@ class Complexf {
             return result;
         }
 
-        Complexf operator * (const double& k) const {
+        Complexf operator * (const f32& k) const {
             Complexf result(
                 this->rval * k, 
                 this->ival * k
@@ -93,7 +98,7 @@ class Complexf {
             return result;
         }
 
-        Complexf operator / (const double& k) const {
+        Complexf operator / (const f32& k) const {
             Complexf result(
                 this->rval / k, 
                 this->ival / k
@@ -102,12 +107,12 @@ class Complexf {
         }
         Complexf operator / (const Complexf& num) const {
             Complexf conj_num(conjugate(num));
-            double s = num.real() * num.real() + num.imaginary() * num.imaginary();
+            f32 s = num.real() * num.real() + num.imaginary() * num.imaginary();
         
             return (*this * conj_num) / s;
         }
 
-        Complexf& operator += (const double& k) {
+        Complexf& operator += (const f32& k) {
             this->rval += k;
 
             return *this;
@@ -119,7 +124,7 @@ class Complexf {
             return *this;
         }
 
-        Complexf& operator -= (const double& k) {
+        Complexf& operator -= (const f32& k) {
             this->rval -= k;
 
             return *this;
@@ -131,31 +136,31 @@ class Complexf {
             return *this;
         }
 
-        Complexf& operator *= (const double& k) {
+        Complexf& operator *= (const f32& k) {
             this->rval *= k;
             this->ival *= k;
 
             return *this;
         }
         Complexf& operator *= (const Complexf& num) {
-            double nr = this->rval*num.real() - this->ival*num.imaginary();
-            double ni = this->rval*num.imaginary() + this->ival*num.real();
+            f32 nr = this->rval*num.real() - this->ival*num.imaginary();
+            f32 ni = this->rval*num.imaginary() + this->ival*num.real();
             this->rval = nr; this->ival = ni;
 
             return *this;
         }
 
-        Complexf& operator /= (const double& k) {
+        Complexf& operator /= (const f32& k) {
             this->rval /= k;
             this->ival /= k;
 
             return *this;
         }
         Complexf& operator /= (const Complexf& num) {
-            double s = num.real() * num.real() + num.imaginary() * num.imaginary();
+            f32 s = num.real() * num.real() + num.imaginary() * num.imaginary();
 
-            double nr = (this->rval * num.real() + this->ival * num.imaginary()) / s;
-            double ni = (this->ival * num.real() - this->rval * num.imaginary()) / s;
+            f32 nr = (this->rval * num.real() + this->ival * num.imaginary()) / s;
+            f32 ni = (this->ival * num.real() - this->rval * num.imaginary()) / s;
             this->rval = nr; this->ival = ni;
 
             return *this;
@@ -173,12 +178,12 @@ class Complexf {
         }
 };
 
-inline Complexf operator + (const double& k, const Complexf& num) { return num + k; }
-inline Complexf operator - (const double& k, const Complexf& num) { return Complexf(k, 0.0) - num; }
-inline Complexf operator * (const double& k, const Complexf& num) { return num * k; }
-inline Complexf operator / (const double& k, const Complexf& num) { return  Complexf(k, 0.0) / num; }
+inline Complexf operator + (const f32& k, const Complexf& num) { return num + k; }
+inline Complexf operator - (const f32& k, const Complexf& num) { return Complexf(k, 0.0f) - num; }
+inline Complexf operator * (const f32& k, const Complexf& num) { return num * k; }
+inline Complexf operator / (const f32& k, const Complexf& num) { return  Complexf(k, 0.0f) / num; }
 
-inline Complexf polar(const double& r, const double& theta) { 
+inline Complexf polar(const f32& r, const f32& theta) { 
     Polar_coord c(r, theta);
     return Complexf(c);
 }
