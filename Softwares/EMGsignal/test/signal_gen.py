@@ -28,9 +28,10 @@ assert p.stdin is not None and p.stdout is not None
 to_filter = p.stdin
 from_filter = p.stdout
 
-# Test constants
-duration = 1
-rate = 2000
+# ------------------------------------------------------------------------------------------------
+# Test parameters
+duration = 1 # test duration
+rate = 2000 # do not change, unless you want to toggle the constants.h and recompile!
 period_us = 1_000_000 / rate
 n_samples = round(duration * rate)
 
@@ -38,22 +39,19 @@ filter_program = "../build/filter_exported.exe"
 
 # Test data generator
 def signal(t_us: int) -> float:
-    sine_freq = 10   # Hz
+    sine_freq = 1000   # Hz
     sine_amplitude = 256.0
     sine_offset = 512.0
 
-    # Signal versus time
     return sine_offset + sine_amplitude * math.sin(2 * math.pi * sine_freq * t_us / 1_000_000)
 
 def task_id(n):
     # used to identify order of data emitted
     return n
-
-# Filtered collected
-result: list[dict] = []
+# ------------------------------------------------------------------------------------------------
 
 def hear():
-    for line in from_filter:    # ends when the filter closes its stdout
+    for line in from_filter: 
         fields = line.split()
         if len(fields) != 2:
             continue
@@ -104,6 +102,9 @@ def plot():
     ax_out.set_xlabel("time (s)")
     fig.tight_layout()
     plt.show()
+
+# Processed data collected
+result: list[dict] = []
 
 # Start threads for each link
 th = threading.Thread(target=send)
