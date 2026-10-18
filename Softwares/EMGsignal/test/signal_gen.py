@@ -22,7 +22,7 @@ p = subprocess.Popen(
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     text=True,
-    bufsize=1,      # line-buffered
+    bufsize=1,
 )
 assert p.stdin is not None and p.stdout is not None
 to_filter = p.stdin
