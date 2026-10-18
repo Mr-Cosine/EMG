@@ -1,4 +1,4 @@
-#include "emg_filters.h"
+#include "src/emg_filters.h"
 
 #if defined(ARDUINO_ARCH_ESP32)
 #include "Arduino.h"
@@ -43,7 +43,7 @@ void setup() {
     const uint32_t period_us = (uint32_t)(1000000L / sample_freq);
 #if defined(ESP_ARDUINO_VERSION_MAJOR) && ESP_ARDUINO_VERSION_MAJOR >= 3
     sampleTimer = timerBegin(1000000);              // 1 MHz tick
-    timerAttachInterrupt(sampleTimer, &sampleISR);
+    timerAttachInterrupt(sampleTimer, &flag_for_sample);
     timerAlarm(sampleTimer, period_us, true, 0);    // auto-reload, run forever
 #else
     sampleTimer = timerBegin(0, 80, true);          // 80 MHz APB / 80 = 1 MHz tick

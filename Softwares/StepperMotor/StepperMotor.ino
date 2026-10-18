@@ -1,4 +1,4 @@
-#include "bipolar_stepper_motor.h"
+#include "src/bipolar_stepper_motor.h"
 
 const int IN1 = 2;
 const int IN2 = 3;
