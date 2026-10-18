@@ -1,4 +1,0 @@
-[submodule "Softwares/EMGsignal/extern/pybind11"]
-	path = Softwares/EMGsignal/extern/pybind11
-	url = https://github.com/pybind/pybind11
-	branch = stable

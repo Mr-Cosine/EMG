@@ -1,5 +1,8 @@
-#include "Arduino.h"
 #include "emg_filters.h"
+
+#if defined(ARDUINO_ARCH_ESP32)
+#include "Arduino.h"
+#endif
 
 #define ADCdebug true
 
@@ -15,14 +18,11 @@ static i32 floor_signal = 0;
 const i32 print_every = 10;
 i32 print_counter = 0;
 
-
 uint32_t timeStamp;
 volatile bool sampleReady = false;
 hw_timer_t* sampleTimer = nullptr;
 
-// analogRead() is not ISR-safe on ESP32, so the ISR only flags the sample
-// and loop() does the actual read.
-void IRAM_ATTR sampleISR() {
+void IRAM_ATTR flag_for_sample() {
     sampleReady = true;
 }
 
@@ -47,7 +47,7 @@ void setup() {
     timerAlarm(sampleTimer, period_us, true, 0);    // auto-reload, run forever
 #else
     sampleTimer = timerBegin(0, 80, true);          // 80 MHz APB / 80 = 1 MHz tick
-    timerAttachInterrupt(sampleTimer, &sampleISR, true);
+    timerAttachInterrupt(sampleTimer, &flag_for_sample, true);
     timerAlarmWrite(sampleTimer, period_us, true);  // auto-reload
     timerAlarmEnable(sampleTimer);
 #endif
