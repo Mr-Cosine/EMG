@@ -1,5 +1,5 @@
 ﻿"LF" = 0.04mm
 "TF" = 0.02mm
-"AngLF"= 0.5
-"AngTF"= 0.3
+"AngLF"= 0.5deg
+"AngTF"= 0.3deg
 

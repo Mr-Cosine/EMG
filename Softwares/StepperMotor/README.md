@@ -15,7 +15,8 @@ Arduino firmware for the linear stepper actuator that drives the gripping motion
 ```
 StepperMotor/
 ├── StepperMotor.ino              Main sketch: manual control with 3 buttons
-├── bipolar_stepper_motor.h/.cpp  Motor driver library
+├── src/
+│   └── bipolar_stepper_motor.h/.cpp  Motor driver library (master copy)
 ├── motor_test/
 │   ├── test_drive.ino            Runs the full stroke forward and back, forever
 │   └── button_test/
@@ -29,7 +30,7 @@ StepperMotor/
         └── bipolar_stepper_motor.h/.cpp
 ```
 
-Arduino only compiles files in the sketch's own folder, so every sketch that uses the motor needs its own copy of `bipolar_stepper_motor.h` and `bipolar_stepper_motor.cpp` next to it. `motor_drive/` already has one. Copy them into `motor_test/` before uploading `test_drive.ino`.
+Arduino only compiles files in the sketch's own folder and its `src/` subfolder, so every sketch that uses the motor needs its own copy of `bipolar_stepper_motor.h` and `bipolar_stepper_motor.cpp`. `motor_drive/` already has one, next to the sketch. Copy them into `motor_test/` before uploading `test_drive.ino`. For `StepperMotor.ino` the library lives in `src/`, so it has to be included as `#include "src/bipolar_stepper_motor.h"`. When you change the library, update the copies in `motor_drive/` as well.
 
 ## Wiring: ##
 
