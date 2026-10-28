@@ -9,7 +9,7 @@ static const f32 pi_f32 = 3.14159265358979f;
 static const i32 sample_freq = 2000;
 
 // coefficient for blur window calculation
-static constexpr i32 GBLUR_SPAN = 3;
+static constexpr i32 GBLUR_SPAN = 5;
 
 // coefficients for LPF and HPF
 static const i32 filter_order = 2;

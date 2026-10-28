@@ -30,24 +30,32 @@ from_filter = p.stdout
 
 # ------------------------------------------------------------------------------------------------
 # Test parameters
-duration = 1 # test duration
+duration = 10 # test duration
 rate = 2000 # do not change, unless you want to toggle the constants.h and recompile!
 period_us = 1_000_000 / rate
 n_samples = round(duration * rate)
-
 filter_program = "../build/filter_exported.exe"
 
 # Test data generator
+
+# waveforms
+def sinewave(frequency: float, amptitude: float, offset: float, t_us: int) -> float:
+    return offset + amptitude * math.sin(2 * math.pi * frequency * t_us / 1_000_000)
+
+# signal generation
 def signal(t_us: int) -> float:
-    sine_freq = 1000   # Hz
-    sine_amplitude = 256.0
-    sine_offset = 512.0
+    def amptitude(t_us: int) -> float:
+        return 256
+    def frequency(t_us: int) -> float:
+        return 1000
+    def offset(t_us: int) -> float:
+        return 1000
 
-    return sine_offset + sine_amplitude * math.sin(2 * math.pi * sine_freq * t_us / 1_000_000)
+    print(f"frequency: {frequency(t_us)}")
+    return sinewave(frequency=frequency(t_us), amptitude=amptitude(t_us), offset=offset(t_us), t_us=t_us)
 
-def task_id(n):
-    # used to identify order of data emitted
-    return n
+# used to identify order of data emitted
+def task_id(n): return n
 # ------------------------------------------------------------------------------------------------
 
 def hear():
@@ -62,21 +70,18 @@ def hear():
 def send():
     start_ns = time.perf_counter_ns()
     n = 0
+    t_us = 0
     try:
         while n < n_samples:
-            t_us = round(n * period_us)
+            t_us += int(period_us)
 
-            # busy-wait: time.sleep() is too coarse for sub-millisecond periods
-            target_ns = start_ns + t_us * 1000
-            while time.perf_counter_ns() < target_ns:
-                pass
+            if time.perf_counter_ns() > start_ns + t_us * 1000: 
+                value = signal(t_us)
+                taskID = task_id(n)
 
-            value = signal(t_us)
-            taskID = task_id(n)
-
-            to_filter.write(f"{value} {taskID}\n")
-            to_filter.flush()
-            n += 1
+                to_filter.write(f"{value} {taskID}\n")
+                to_filter.flush()
+                n += 1
     except (BrokenPipeError, KeyboardInterrupt):
         pass
     finally:
