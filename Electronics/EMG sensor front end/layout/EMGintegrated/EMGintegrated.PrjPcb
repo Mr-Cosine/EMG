@@ -50,6 +50,40 @@ PrefsVaultGUID=
 PrefsRevisionGUID=
 
 [Document1]
+DocumentPath=S2B-PH-SM4-TB.SchLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=DXTYTQRA
+
+[Document2]
+DocumentPath=JST_S2B-PH-SM4-TB.PcbLib
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=UIHBFGYO
+
+[Document3]
 DocumentPath=KMR221GLFS.SchLib
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -66,7 +100,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=DXAZVBUK
 
-[Document2]
+[Document4]
 DocumentPath=SW_KMR221GLFS.PcbLib
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -83,7 +117,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=NRAKQUKV
 
-[Document3]
+[Document5]
 DocumentPath=EMGfrontend.PcbLib
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -100,7 +134,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=WUEMAGDU
 
-[Document4]
+[Document6]
 DocumentPath=EMGfrontend.SCHLIB
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -117,7 +151,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=WKHCGQPS
 
-[Document5]
+[Document7]
 DocumentPath=EMGintegrated.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -134,7 +168,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=COJCTUSM
 
-[Document6]
+[Document8]
 DocumentPath=VREF.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -151,7 +185,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=ZDUVLANT
 
-[Document7]
+[Document9]
 DocumentPath=LPF(500Hz).SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -168,7 +202,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=WZGTOLWO
 
-[Document8]
+[Document10]
 DocumentPath=HPF(20Hz).SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -185,7 +219,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=APSCGWHZ
 
-[Document9]
+[Document11]
 DocumentPath=AMP1.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -202,7 +236,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=HCCMIUGK
 
-[Document10]
+[Document12]
 DocumentPath=EMGfrontend.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -219,7 +253,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=WDKROSHD
 
-[Document11]
+[Document13]
 DocumentPath=AMP2.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -236,7 +270,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=BBQGTCNA
 
-[Document12]
+[Document14]
 DocumentPath=EMGintegrated.BomDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -253,7 +287,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
-[Document13]
+[Document15]
 DocumentPath=EMGintegrated.PcbDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -270,7 +304,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=MBBFXNXK
 
-[Document14]
+[Document16]
 DocumentPath=Powereg.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -287,7 +321,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=OJPYGTKC
 
-[Document15]
+[Document17]
 DocumentPath=EMGintegrated.PcbLib
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -304,7 +338,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=XECNRJNN
 
-[Document16]
+[Document18]
 DocumentPath=EMGintegrated.SCHLIB
 AnnotationEnabled=1
 AnnotateStartValue=1
