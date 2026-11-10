@@ -52,7 +52,7 @@ void loop() {
         if (++printCounter >= sampleEvery) {
             printCounter = 0;
             Serial.print("Min:0, ");
-            Serial.print("Max:200, ");
+            Serial.print("Max:400, ");
 
             Serial.print("Signal:");
             Serial.println(envelope);
