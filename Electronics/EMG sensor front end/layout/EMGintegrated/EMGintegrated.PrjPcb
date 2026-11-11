@@ -359,6 +359,10 @@ DocumentUniqueId=WPCQXJGY
 DocumentPath=
 DItemRevisionGUID=
 
+[GeneratedDocument2]
+DocumentPath=
+DItemRevisionGUID=
+
 [Configuration1]
 Name=Sources
 ParameterCount=0
