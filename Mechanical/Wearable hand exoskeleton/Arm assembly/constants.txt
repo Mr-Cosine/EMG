@@ -1,0 +1,3 @@
+﻿"bandwidth"= 20mm
+"loosefit"= 0.5mm
+"tightfit"= 0.2mm
