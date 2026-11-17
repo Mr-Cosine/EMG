@@ -59,7 +59,7 @@ void process(void*) {
         new_sample = false;
 
         filtered = myFilter.process((_float)raw);
-        envelope = abs(filtered) * adjustment_factor;
+        envelope = filtered * adjustment_factor;
         
         print_data(envelope);
     }
@@ -67,7 +67,7 @@ void process(void*) {
 
 void setup() {
     Serial.begin(460800);
-    xTaskCreatePinnedToCore(sample, "sample", 1024, NULL, 2, &sampleTask, 0); //Core 0 for sampling and motor.
+    xTaskCreatePinnedToCore(sample, "sample", 4096, NULL, 2, &sampleTask, 0); //Core 0 for sampling and motor.
     xTaskCreatePinnedToCore(process, "process", 4096, NULL, 1, NULL, 1); //Hog core 1 for processing entirely.
 
     timer = timerBegin(1000000);                 // 1 MHz tick = 1 µs units

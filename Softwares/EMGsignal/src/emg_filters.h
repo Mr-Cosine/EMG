@@ -48,6 +48,7 @@ class EMGFilters {
             if (this->hipass_enabled) output = HPF.process(output);
             if (this->lopass_enabled) output = LPF.process(output);
             if (this->notch_enabled)  output = AHF.process(output);
+            output = abs(output);
             if (this->blur_enabled)   output = (_float)GB.blur((dataType)output);
 
             return (dataType)output;
