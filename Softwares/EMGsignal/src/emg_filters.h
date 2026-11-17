@@ -20,9 +20,9 @@ class EMGFilters {
         bool blur_enabled;
 
     public:
-        EMGFilters(bool bypass_all, bool enable_notch, bool enable_lopass, bool enable_hipass, bool enable_blur):
+        EMGFilters(bool force_bypass, bool enable_notch, bool enable_lopass, bool enable_hipass, bool enable_blur):
             GB(true),
-            bypass_all(bypass_all || (!enable_notch && !enable_lopass && !enable_hipass && !enable_blur)),
+            bypass_all(force_bypass || (!enable_notch && !enable_lopass && !enable_hipass && !enable_blur)),
             notch_enabled(enable_notch),
             lopass_enabled(enable_lopass),
             hipass_enabled(enable_hipass),
@@ -43,12 +43,12 @@ class EMGFilters {
         dataType process(dataType inputValue) {
             if (this->bypass_all) return inputValue;
 
-            f32 output = (f32)inputValue;
+            float output = (float)inputValue;
 
             if (this->hipass_enabled) output = HPF.process(output);
             if (this->lopass_enabled) output = LPF.process(output);
             if (this->notch_enabled)  output = AHF.process(output);
-            if (this->blur_enabled)   output = (f32)GB.blur((dataType)output);
+            if (this->blur_enabled)   output = (float)GB.blur((dataType)output);
 
             return (dataType)output;
         }

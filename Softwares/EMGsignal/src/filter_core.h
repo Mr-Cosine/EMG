@@ -8,29 +8,29 @@
 
 class Butterworth {
     private:
-        Queue<f32, filter_order+1> input_state;
-        Queue<f32, filter_order> output_state;
-        f32 a[filter_order + 1];
-        f32 b[filter_order + 1];
+        Queue<float, filter_order+1> input_state;
+        Queue<float, filter_order> output_state;
+        float a[filter_order + 1];
+        float b[filter_order + 1];
 
-        void _create_kernel(const Complexf* roots, i32 n, f32 res[]) {
+        void _create_kernel(const Complexf* roots, integer n, float res[]) {
             Complexf c[filter_order + 1];
 
             c[0] = Complexf(1.0f, 0.0f);
-            for (i32 i = 1; i <= n; ++i) c[i] = Complexf(0.0f, 0.0f);
+            for (integer i = 1; i <= n; ++i) c[i] = Complexf(0.0f, 0.0f);
 
-            for (i32 k = 0; k < n; ++k) {
-                for (i32 i = k + 1; i >= 1; --i) c[i] -= roots[k] * c[i - 1];
+            for (integer k = 0; k < n; ++k) {
+                for (integer i = k + 1; i >= 1; --i) c[i] -= roots[k] * c[i - 1];
             }
 
-            for (i32 i = 0; i <= filter_order; i++) {
+            for (integer i = 0; i <= filter_order; i++) {
                 res[i] = c[i].real();
             }
         }
 
     public:
         Butterworth() {
-            for (i32 i = 0; i <= filter_order; ++i) { a[i] = 0.0f; b[i] = 0.0f; }
+            for (integer i = 0; i <= filter_order; ++i) { a[i] = 0.0f; b[i] = 0.0f; }
             a[0] = 1.0f;
             b[0] = 1.0f;
             this->clear_state();
@@ -41,8 +41,8 @@ class Butterworth {
             this->output_state.flush(0.0f);
         }
 
-        void init(f32 cutoff, bool is_lpf) {
-            for (i32 i = 0; i <= filter_order; ++i) {
+        void init(float cutoff, bool is_lpf) {
+            for (integer i = 0; i <= filter_order; ++i) {
                 a[i] = 0.0f;
                 b[i] = 0.0f;
             }
@@ -50,19 +50,19 @@ class Butterworth {
 
             if (cutoff <= 0.0f || cutoff >= sample_freq / 2.0f) return;
 
-            const f32 K  = 2.0f * sample_freq;
-            const f32 Wc = K * tanf(pi_f32 * cutoff / sample_freq);
+            const float K  = 2.0f * sample_freq;
+            const float Wc = K * tanf(pi_f32 * cutoff / sample_freq);
 
             Complexf poles[filter_order];
             Complexf zeros[filter_order];
 
             Complexf prod(1.0f, 0.0f);
 
-            f32 zero = 1.0f;
+            float zero = 1.0f;
             if (is_lpf) zero = -1.0f;
 
-            for (i32 k = 1; k <= filter_order; ++k) {
-                const f32 theta = pi_f32 * (2.0f * k + filter_order - 1.0f) / (2.0f * filter_order);
+            for (integer k = 1; k <= filter_order; ++k) {
+                const float theta = pi_f32 * (2.0f * k + filter_order - 1.0f) / (2.0f * filter_order);
                 const Complexf s  = Complexf(Polar_coord(1.0f, theta)) * Wc;
                 const Complexf pk = (K + s) / (K - s);
 
@@ -71,20 +71,20 @@ class Butterworth {
                 prod *= (Complexf(1.0f, 0.0f) + pk * zero);
             }
 
-            const f32 G = prod.real() / (f32)(1 << filter_order);
+            const float G = prod.real() / (float)(1 << filter_order);
 
             this->_create_kernel(zeros, filter_order, b);
             this->_create_kernel(poles, filter_order, a);
-            for (i32 i = 0; i <= filter_order; ++i) b[i] *= G;
+            for (integer i = 0; i <= filter_order; ++i) b[i] *= G;
         }
 
-        f32 process(f32 input) {
+        float process(float input) {
             input_state.update(input);
 
-            f32 output = 0.0f;
-            for (i32 i = 0; i <= filter_order; ++i)
+            float output = 0.0f;
+            for (integer i = 0; i <= filter_order; ++i)
                 output += b[i] * input_state[filter_order - i];     // b_i * x[n-i]
-            for (i32 j = 1; j <= filter_order; ++j)
+            for (integer j = 1; j <= filter_order; ++j)
                 output -= a[j] * output_state[filter_order - j];         // a_j * y[n-j]
 
             output_state.update(output);                          // remember y[n] for next call
@@ -109,15 +109,15 @@ class Hipass : public Butterworth {
 class Notch {
     class Core {
         private:
-            f32 a[3];
-            f32 b[3];
-            Queue<f32, 2> state;
+            float a[3];
+            float b[3];
+            Queue<float, 2> state;
 
         public:
             Core():
             state(true, 0.0f)
             {
-                for (i32 i = 0; i < 3; i++) {
+                for (integer i = 0; i < 3; i++) {
                     this->a[i] = 0.0f;
                     this->b[i] = 0.0f;
                 }
@@ -127,11 +127,11 @@ class Notch {
                 this->state.flush(0.0f);
             }
 
-            void init(i32 frequency, i32 freq_multiplier, f32 Q) {
-                const f32 w0   = 2.0f * pi_f32 * frequency * freq_multiplier / sample_freq;
-                const f32 beta = tanf(w0 / (2.0f * Q));
-                const f32 g    = 1.0f / (1.0f + beta);
-                const f32 c    = 2.0f * cosf(w0);
+            void init(integer frequency, integer freq_multiplier, float Q) {
+                const float w0   = 2.0f * pi_f32 * frequency * freq_multiplier / sample_freq;
+                const float beta = tanf(w0 / (2.0f * Q));
+                const float g    = 1.0f / (1.0f + beta);
+                const float c    = 2.0f * cosf(w0);
 
                 this->a[0] = 1.0f;
                 this->a[1] = -c * g;
@@ -143,8 +143,8 @@ class Notch {
 
             }
 
-            f32 process(f32 input) {
-                f32 output;
+            float process(float input) {
+                float output;
                 output  = b[0] * input + this->state[0];
                 this->state[0] = (this->b[1] * input + this->state[1]) - this->a[1] * output;
                 this->state[1] = this->b[2] * input - this->a[2] * output;
@@ -166,13 +166,13 @@ class Notch {
             this->second_harmonic.clear_state();
         }
 
-        void init(f32 Q) {
+        void init(float Q) {
             base.init(hum_freq, 1, Q);
             second_harmonic.init(hum_freq, 2, Q);
         }
 
-        f32 process(f32 input) {
-            f32 output = base.process(input);
+        float process(float input) {
+            float output = base.process(input);
             return second_harmonic.process(output);
         }
 };
