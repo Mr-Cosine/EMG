@@ -39,7 +39,6 @@ inline void print_data(_float envelope) {
 }
 
 void process(void*) {
-    //Hog core 1 for processing entirely.
     EMGFilters<_float> myFilter(
         false,
         true,
@@ -68,8 +67,8 @@ void process(void*) {
 
 void setup() {
     Serial.begin(460800);
-    xTaskCreatePinnedToCore(sample, "sample", 1024, NULL, 2, &sampleTask, 0);
-    xTaskCreatePinnedToCore(process, "process", 4096, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(sample, "sample", 1024, NULL, 2, &sampleTask, 0); //Core 0 for sampling and motor.
+    xTaskCreatePinnedToCore(process, "process", 4096, NULL, 1, NULL, 1); //Hog core 1 for processing entirely.
 
     timer = timerBegin(1000000);                 // 1 MHz tick = 1 µs units
     timerAttachInterrupt(timer, &onTimer);
