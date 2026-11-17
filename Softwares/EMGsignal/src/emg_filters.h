@@ -43,12 +43,12 @@ class EMGFilters {
         dataType process(dataType inputValue) {
             if (this->bypass_all) return inputValue;
 
-            float output = (float)inputValue;
+            _float output = (_float)inputValue;
 
             if (this->hipass_enabled) output = HPF.process(output);
             if (this->lopass_enabled) output = LPF.process(output);
             if (this->notch_enabled)  output = AHF.process(output);
-            if (this->blur_enabled)   output = (float)GB.blur((dataType)output);
+            if (this->blur_enabled)   output = (_float)GB.blur((dataType)output);
 
             return (dataType)output;
         }

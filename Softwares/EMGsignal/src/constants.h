@@ -3,24 +3,24 @@
 
 #include "types.h"
 
-static const float pi_f32 = 3.14159265358979f;
+static const _float pi_f32 = 3.14159265358979f;
 
 // sampling frequency
-static const integer sample_freq = 2000;
+static const _int sample_freq = 4000;
 
 // coefficient for blur window calculation
-static constexpr integer GBLUR_SPAN = 5;
+static constexpr _int GBLUR_SPAN = 5;
 
 // coefficients for LPF and HPF
-static const integer filter_order = 2;
-static const integer lpf_cutoff = 500;
-static const integer hpf_cutoff = 20;
+static const _int filter_order = 2;
+static const _int lpf_cutoff = 500;
+static const _int hpf_cutoff = 20;
 
 // coefficients for notch filter
-static const integer hum_freq = 60;
-static const float quality_factor = 30.0f;
+static const _int hum_freq = 60;
+static const _float quality_factor = 30.0f;
 
 // How much the processed signal is scaled
-static const float amplification_factor = 2.0f;
+static const _float amplification_factor = 2.0f;
 
 #endif
